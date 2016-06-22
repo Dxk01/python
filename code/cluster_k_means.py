@@ -6,8 +6,6 @@
 import sys
 sys.path.append("/home/spark1/python/")
 sys.path.append("/home/spark/anqu/code")
-sys.path.append("/home/spark/anqu/code/Tools")
-sys.path.append("/home/spark/anqu/code/wordAnalysis")
 reload(sys)
 sys.setdefaultencoding('utf8') 
 import numpy as np
@@ -19,8 +17,6 @@ import data_deal
 import time 
 import mysql_op
 import myself_cluster
-import particeple
-import wordStatic
 
 class Cluster_K_Means():
 	def __init__(self):
@@ -35,13 +31,13 @@ class Cluster_K_Means():
 
 	def cluster_k_means(self,mat):
 		# print mat[0]
-		resualt = KMeans(n_clusters=200,random_state=200).fit_predict(mat)
+		resualt = KMeans(n_clusters=2000,random_state=200).fit_predict(mat)
 		# for re in resualt:
 		# 	print re
 		return resualt
 
 	def cluster_mini_k_means(self,mat):
-		return MiniBatchKMeans(n_clusters=200,random_state=4000).fit_predict(mat)
+		return MiniBatchKMeans(n_clusters=2000,random_state=4000).fit_predict(mat)
 
 	def classifaction(self,word_cluster_resault,Iddic,Id):
 		pass
@@ -79,25 +75,15 @@ class Cluster_K_Means():
 		if type == 1:
 			fp.write('''//--------------------------------------------------------------------------------------------------------//
 				    ----------------------------------------using k-means method-------------------------------------\
-				   //---------------------------------------------------------------------------------------------------------//\n''')
+				   //---------------------------------------------------------------------------------------------------------//''')
 		else:
 			fp.write('''//--------------------------------------------------------------------------------------------------------//
 				    -----------------------------------using mini-k-means method----------------------------------\
-				   //---------------------------------------------------------------------------------------------------------//\n''')
-		particepleW = particeple.participle()
-		word_static = wordStatic.wordStatic()
+				   //---------------------------------------------------------------------------------------------------------//''')
 		for line in word_cluster_resault.keys():
-			word_list = word_cluster_resault.get(line)
-			word_an_re = particepleW.participleCluster(word_list)
-			Describe_words = word_static.getStaticResault(word_an_re)
-			writer_context = "class   "+ str(line) + " \nObject includes : "
-			for Dws in Describe_words:
-				writer_context += Dws + "  "
-			writer_context += " \ncontain words : \n"
-			fp.write(writer_context)
+			fp.write("class   "+ str(line) + "  contain words :   \n")
 			word_list = word_cluster_resault.get(line)
 			count = 0
-
 			for word in word_list:
 				fp.write(word+"   ")
 				count += 1
@@ -110,8 +96,6 @@ class Cluster_K_Means():
 		mysql = mysql_op.mysql_op("127.0.0.1","root","root","mysql")
 		mysql.excute("create table if not exists cluster_resault (class_num int,words text)")
 		mysql.excute("delete from cluster_resault")
-
-		particepleW = particeple.particeple()
 		for line in word_cluster_resault.keys():
 			data = ""
 			word_list = word_cluster_resault.get(line)
@@ -127,15 +111,13 @@ def main():
 	
 
 	# k-means method
-	# resualt = clusterk_means.cluster_k_means(Matrix)
-	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
-	# clusterk_means.writer_to_LocalFile(word_cluster_resault,1)
-
+	resualt = clusterk_means.cluster_k_means(Matrix)
+	word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
+	clusterk_means.writer_to_LocalFile(word_cluster_resault,1)
 	# # mini k-means method
-	secResault = clusterk_means.cluster_mini_k_means(Matrix)
-	word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
-	clusterk_means.writer_to_LocalFile(word_cluster_resault)
-
+	# secResault = clusterk_means.cluster_mini_k_means(Matrix)
+	# word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
+	# clusterk_means.writer_to_LocalFile(word_cluster_resault)
 	# # fuzzy self-organizing map Neural Network method
 	# cla_num,resualt = myself_cluster.m_cluster_Som().cluster(Matrix)
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)

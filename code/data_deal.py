@@ -22,10 +22,10 @@ class data_deal():
 
 	def getsearchword(self):
 		# return list(self.mysql.select("select word, genre from searchApp"))
-		return self.mysql.select("select word from ansearchApp where type=1")
+		return self.mysql.select("select word from ansearchApp where type=1 and genre like '%6014%'")
 
 	def getsearchgenre(self):
-		return self.mysql.select("select genre from ansearchApp where type=1")
+		return self.mysql.select("select genre from ansearchApp where type=1 and genre like \'%6014%\'")
 
 	def tranGenretoGenreIDList(self,genrelist):
 		genreIDlist = []
