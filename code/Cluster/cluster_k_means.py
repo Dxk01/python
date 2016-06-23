@@ -5,7 +5,7 @@
 
 import sys
 sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/code")
+sys.path.append("/home/spark/anqu/code/data_deal")
 sys.path.append("/home/spark/anqu/code/Tools")
 sys.path.append("/home/spark/anqu/code/wordAnalysis")
 reload(sys)
@@ -29,23 +29,19 @@ class Cluster_K_Means():
 	def  getData(self):
 		data_a = data_deal.data_deal()
 		mat,wdic = data_a.getMatrix()
-		# print len(mat)
 		Iddic = data_a.getIddic(wdic)
 		return mat,Iddic
 
+	#K-Means,返回聚类结果
 	def cluster_k_means(self,mat):
-		# print mat[0]
 		resualt = KMeans(n_clusters=200,random_state=200).fit_predict(mat)
-		# for re in resualt:
-		# 	print re
 		return resualt
 
+	# mini batch K-Means 聚类 返回聚类结果
 	def cluster_mini_k_means(self,mat):
-		return MiniBatchKMeans(n_clusters=200,random_state=4000).fit_predict(mat)
+		return MiniBatchKMeans(n_clusters=100,random_state=400,init_size=6000).fit_predict(mat)
 
-	def classifaction(self,word_cluster_resault,Iddic,Id):
-		pass
-
+	#聚类结果与词条映射
 	def mapResault(self,resualt,Iddic):
 		word_cluster_resault = {}
 		length = len(resualt)
@@ -58,6 +54,7 @@ class Cluster_K_Means():
 				word_cluster_resault.setdefault(resualt[num],word_list)
 		return word_cluster_resault
 
+	#打印聚类分析结果
 	def print_Resault(self,word_cluster_resault):
 		for line  in word_cluster_resault.keys():
 			print "class "+ str(line) + "  contain words : " 
@@ -70,6 +67,7 @@ class Cluster_K_Means():
 					print ''
 			print "\n\n\n"
 
+	#将聚类分析结果写入文件
 	def writer_to_LocalFile(self,word_cluster_resault,type=2):
 		filepath = "/home/spark/anqu/analysisResault/"
 		ISOTIMEFORMAT='%Y-%m-%d %X'
@@ -97,7 +95,6 @@ class Cluster_K_Means():
 			fp.write(writer_context)
 			word_list = word_cluster_resault.get(line)
 			count = 0
-
 			for word in word_list:
 				fp.write(word+"   ")
 				count += 1
@@ -105,6 +102,7 @@ class Cluster_K_Means():
 					fp.write("\n")
 			fp.write("\n\n\n\n")#k-means : 1 ;mini-k-means : 2
 
+	#聚类分析结果写入数据库
 	def write_to_sql(self,word_cluster_resault):
 		print 'start.......'
 		mysql = mysql_op.mysql_op("127.0.0.1","root","root","mysql")
@@ -120,11 +118,29 @@ class Cluster_K_Means():
 			sql = "insert into cluster_resault values(%d,%s)"%(line,data)
 			print sql
 			mysql.excute(sql)
+	def run(self):
+		clusterk_means = Cluster_K_Means()
+		Matrix,Iddic = clusterk_means.getData()
+
+		# k-means method
+		# resualt = clusterk_means.cluster_k_means(Matrix)
+		# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
+		# clusterk_means.writer_to_LocalFile(word_cluster_resault,1)
+
+		# # mini k-means method
+		secResault = clusterk_means.cluster_mini_k_means(Matrix)
+		# word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
+		# clusterk_means.writer_to_LocalFile(word_cluster_resault)
+		
+		# # fuzzy self-organizing map Neural Network method
+		# cla_num,resualt = myself_cluster.m_cluster_Som().cluster(Matrix)
+		# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
+		# clusterk_means.writer_to_LocalFile(word_cluster_resault)
+		# print "get classfacation : ",cla_num
 
 def main():
 	clusterk_means = Cluster_K_Means()
 	Matrix,Iddic = clusterk_means.getData()
-	
 
 	# k-means method
 	# resualt = clusterk_means.cluster_k_means(Matrix)
@@ -135,7 +151,7 @@ def main():
 	secResault = clusterk_means.cluster_mini_k_means(Matrix)
 	word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
 	clusterk_means.writer_to_LocalFile(word_cluster_resault)
-
+	
 	# # fuzzy self-organizing map Neural Network method
 	# cla_num,resualt = myself_cluster.m_cluster_Som().cluster(Matrix)
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
