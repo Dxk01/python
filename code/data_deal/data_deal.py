@@ -27,7 +27,7 @@ class data_deal():
 		return self.mysql.select("select word from ansearchApp where type=1 and genre like \'%6014%\'")
 
 	def getsearchgenre(self):
-		return self.mysql.select("select genre from ansearchApp where type=1 and genre like \'%6014%\'")
+		return self.mysql.select("select genre from ansearchApp where type=1  and genre like \'%6014%\'")
 
 	#获取word的词热和searchCount
 	def getWordPrioandSearchC(self):
@@ -35,7 +35,7 @@ class data_deal():
 
 	#去除重复的热词，合并词热和searchCount
 	def delRepeat(self):
-		data = self.mysql.getWordPriority("select word,priority,searchCount from ansearchApp where type = 1 and genre like \'%6014%\'")
+		data = self.mysql.getWordPriority("select word,priority,searchCount from ansearchApp where type = 1  and genre like \'%6014%\'")
 		word = {}
 		priority_searchCount = []
 		count = 0
@@ -126,6 +126,7 @@ class data_deal():
 		# print ddic
 		s_time = time.time()
 		data1 = self.getsearchword()
+		# print data1
 		e_time = time.time()
 		# print e_time - s_time
 		s_time = time.time()
@@ -134,6 +135,7 @@ class data_deal():
 		# print e_time - s_time
 		wdic,gdic = self.mapwordAgenre(data1,data2)
 		# print len(wdic),len(gdic)
+		# print wdic
 		Matrix = self.buildMatrix(wdic,gdic,ddic)
 		# daDic = self.mapData(Matrix)
 		# return daDic
@@ -152,8 +154,9 @@ class data_deal():
 
 def main():
 	data_d = data_deal()
-	# mat = data_d.getMatrix()
-	data = data_d.getWordPrioandSearchC()
+	mat = data_d.getMatrix()
+	# print mat
+	# data = data_d.getWordPrioandSearchC()
 
 if __name__ == '__main__':
 	main()

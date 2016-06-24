@@ -39,6 +39,7 @@ class Cluster_K_Means():
 
 	# mini batch K-Means 聚类 返回聚类结果
 	def cluster_mini_k_means(self,mat):
+		# print mat
 		return MiniBatchKMeans(n_clusters=100,random_state=400,init_size=6000).fit_predict(mat)
 
 	#聚类结果与词条映射
@@ -96,7 +97,7 @@ class Cluster_K_Means():
 			word_list = word_cluster_resault.get(line)
 			count = 0
 			for word in word_list:
-				fp.write(word+"   ")
+				fp.write(word+"  ; ")
 				count += 1
 				if count % 5 == 0:
 					fp.write("\n")
@@ -141,7 +142,7 @@ class Cluster_K_Means():
 def main():
 	clusterk_means = Cluster_K_Means()
 	Matrix,Iddic = clusterk_means.getData()
-
+	print len(Matrix)
 	# k-means method
 	# resualt = clusterk_means.cluster_k_means(Matrix)
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)

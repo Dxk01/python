@@ -20,25 +20,33 @@ class mysql_op():
 
 	def  is_contains(self,line):
 		if line[0].contain("\'"):
-			return "insert into ansearchApp values(\"%s\",%d,%s,%d,%s,%d,%d)"%line
+			return "insert into ansearchApp values(\"%s\",%d,%d,%d)"%line
 		else :
-			return "insert into ansearchApp values(\"%s\",%d,%s,%d,%s,%d,%d)"%line
+			return "insert into ansearchApp values(\"%s\",%d,%d,%d)"%line
 
 	def selectA(self):
-		resault = self.cur.execute("select * from searchApp")
-		data = self.cur.fetchall()
+		resault = self.cur.execute("select word,priority ,searchCount  ,genre ,type,time from searchApp")
+		# data = self.cur.fetchall()
+		# self.cur.execute("delete from ansearchApp")
 		data_l = []
 		count = 0
 		chin = chinese.chinese()
-		for line in data:#self.cur.fetchall():
-			if chin.is_chinese(line[0]):
+		#创建ansearchApp表
+		#create table ansearchApp(word varchar(255),priority int,searchCount int ,genre varchar(255),type int,time int);
+		anS_conn = MySQLdb.connect(host = 'localhost',user='root',passwd='root',db = 'mysql',port=3306,charset='utf8')
+		anS_cur = anS_conn.cursor()
+		print self.cur.rowcount
+		for i in  xrange(self.cur.rowcount):#self.cur.fetchall():
+			line = self.cur.fetchone()
+			if chin.is_chinese(line[0]) :
 				data_l.append(line)
 				if chin.is_contains(line[0]):
-					sql = "insert into ansearchApp values(\"%s\",%d,\'%s\',%d,\'%s\',%d,%d)"%line
+					sql = "insert into ansearchApp values(\"%s\",%d,%d,\'%s\',%d,%d)"%line
 				else : 
-					sql = "insert into ansearchApp values(\'%s\',%d,\'%s\',%d,\'%s\',%d,%d)"%line
-				self.cur.execute(sql)
-				self.conn.commit()
+					sql = "insert into ansearchApp values(\'%s\',%d,%d,\'%s\',%d,%d)"%line
+				print sql
+				anS_cur.execute(sql)
+				anS_conn.commit()
 
 	def delete(self):
 		try :
@@ -94,10 +102,11 @@ class mysql_op():
 
 def main():
 	mysql = mysql_op("127.0.0.1","root","root","mysql")
-	data = mysql.getWordPriority("select  word,priority,searchCount from ansearchApp where type = 1 and genre like \"%6014%\"")
-	for line in data:
-		print line[0],line[1],line[2]
-
+	# data = mysql.getWordPriority("select  word,priority,searchCount from ansearchApp where type = 1 and genre like \"%6014%\"")
+	# for line in data:
+		# print line[0],line[1],line[2]
+	# 数据去重，过滤速度慢
+	mysql.selectA()
 
 if __name__ == '__main__':
 	main()

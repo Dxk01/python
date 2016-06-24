@@ -9,9 +9,6 @@ class chinese():
 	def __init__(self):
 		pass
 
-	# def is_chinese_word(self,c_str):
-		
-
 	def is_chinese(self,c_str):
 		zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
 		#一个小应用，判断一段文本中是否包含简体中：
@@ -35,7 +32,7 @@ class chinese():
 
 def main():
 	chin = chinese()
-	str_1 = u'1223一个小应用，判断一段文本中是否包含简体中：'
+	str_1 = u'微信'
 	str_2 = u'应用fashkjhdfshajfj fhdsjkahfdhak fdsa'
 	print str_1,"is",chin.is_chinese(str_1)
 	print str_2,"is",chin.is_chinese(str_2)
