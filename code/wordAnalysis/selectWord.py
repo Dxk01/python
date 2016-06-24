@@ -70,10 +70,8 @@ class selectWord():
 		min_searchCount_word = []
 		for line in min_searchCount_re:
 			sql = "select word,searchCount,cluster  from wordSelectFeature where searchCount = %d and cluster = %d"%line
-			data = self.mysql.select(sql)
-			print type(data)
-			print data[0],data[1],data[2]
-			min_searchCount_word.append(data)
+			data = self.mysql.getWordPriority(sql)
+			min_searchCount_word.append(data[0])
 		return min_searchCount_word
 
 	# 获取当前词中各类簇中searchCount最大的 Top K
@@ -81,10 +79,10 @@ class selectWord():
 		max_searchCount_re = self.mysql.getWordPriority("select max(searchCount),cluster from wordSelectFeature group by cluster")
 		print 
 		max_searchCount_word = []
-		for line in min_searchCount_re:
+		for line in max_searchCount_re:
 			sql = "select word,searchCount,cluster  from wordSelectFeature where searchCount = %d and cluster = %d"%line
-			data = self.mysql.select(sql)
-			max_searchCount_word.append((data[0],data[1],data[2]))
+			data = self.mysql.getWordPriority(sql)
+			max_searchCount_word.append(data[0])
 		return max_searchCount_word
 
 def main():
@@ -92,11 +90,9 @@ def main():
 	# word_list = SelectWord.selectMaxPriority()
 	# word_list = SelectWord.selectTopKMinPriority(10)
 	# word_list = SelectWord.selectMinPriorityofCluster()
-	word_list = SelectWord.selectMinSerachCountOfCluster()
-
+	word_list = SelectWord.selectMaxSearchCountOfCluster()
 	for word in word_list:
-		# print type(word)
-		# print word[0],word[1],word[2]
+		print word[0],word[1],word[2]
 		pass
 
 if __name__ == '__main__':
