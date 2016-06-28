@@ -5,7 +5,7 @@
 
 import sys
 sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/code")
+sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
 sys.setdefaultencoding('utf8') 
 

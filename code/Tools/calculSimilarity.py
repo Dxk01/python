@@ -5,10 +5,10 @@
 
 import sys
 sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/code/data_deal")
-sys.path.append("/home/spark/anqu/code/Tools")
-sys.path.append("/home/spark/anqu/code/wordAnalysis")
-sys.path.append("/home/spark/anqu/code/Cluster")
+sys.path.append("/home/spark/anqu/python/code/data_deal")
+sys.path.append("/home/spark/anqu/python/code/Tools")
+sys.path.append("/home/spark/anqu/python/code/wordAnalysis")
+sys.path.append("/home/spark/anqu/python/code/Cluster")
 reload(sys)
 sys.setdefaultencoding('utf8') 
 

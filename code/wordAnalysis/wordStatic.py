@@ -5,7 +5,7 @@
 
 import sys
 sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/code")
+sys.path.append("/home/spark/anqu/python/code/Tools")
 reload(sys)
 sys.setdefaultencoding('utf8') 
 import jieba
@@ -28,6 +28,7 @@ class wordStatic():
 				word_count.setdefault(word,1)
 		return word_count,length
 
+	#词的合并：将字词合并为一个全词如：六边--->六边形
 	def combine_subWord(self,sort_word):
 		length = len(sort_word)
 		Describe_Words = []
@@ -40,11 +41,11 @@ class wordStatic():
 		for i in xrange(length-1):
 			state = False
 			for j in xrange(i+1,length):
-				if sort_word[i] in sort_word[j]:
+				if sort_word[i][0] in sort_word[j][0]:
 					state = True
-				elif sort_word[j] in sort_word[i]:
+				elif sort_word[j][0] in sort_word[i][0]:
 					state = True
-					sort_word[j] = sort_word[i]
+					sort_word[j][0] = sort_word[i][0]
 				else:
 					continue
 			if state == False:
@@ -52,11 +53,13 @@ class wordStatic():
 		Describe_Words.append(sort_word[length - 1])
 		return Describe_Words
 
+	#打印合并词的结果
 	def printWord(self,word):
 		for w in word:
-			print w,
+			print w[0],
 		print ''
 
+	#
 	def getWord(self,word_count,length,threshold_V= 0.008,word_num = 10):
 		sort_re = sorted(word_count.iteritems(), key=lambda d:d[1], reverse = True)
 		re = []
@@ -77,24 +80,22 @@ class wordStatic():
 		Dws = self.getWord(word_count,length)
 		return Dws
 
-def combine_substr(word_list):
-	# if len(word_list) <= 1:
-		# return word_list:
-	length = len(word_list)
-	if length == 1:
-		return word_list
-	re = []
-	for i in xrange(length-1):
-		print word_list[i]
-		st = False
-		for j in xrange(i+1,length):
-			print word_list[j]
-			if word_list[i] in word_list[j]:
-				st = True
-		if st == False :
-			re.append(word_list[i])
-	re.append(word_list[length-1])
-	return re
+# def combine_substr(word_list):
+# 	# if len(word_list) <= 1:
+# 		# return word_list:
+# 	length = len(word_list)
+# 	if length == 1:
+# 		return word_list
+# 	re = []
+# 	for i in xrange(length-1):
+# 		st = False
+# 		for j in xrange(i+1,length):
+# 			if word_list[i] in word_list[j]:
+# 				st = True
+# 		if st == False :
+# 			re.append(word_list[i])
+# 	re.append(word_list[length-1])
+# 	return re
 def main():
 	word_static = wordStatic()
 	#消除  罗斯  俄罗斯  消消  六边  七彩  六角  方块  六边形  游戏   

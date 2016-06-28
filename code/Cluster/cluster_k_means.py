@@ -5,9 +5,9 @@
 
 import sys
 sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/code/data_deal")
-sys.path.append("/home/spark/anqu/code/Tools")
-sys.path.append("/home/spark/anqu/code/wordAnalysis")
+sys.path.append("/home/spark/anqu/python/code/data_deal")
+sys.path.append("/home/spark/anqu/python/code/Tools")
+sys.path.append("/home/spark/anqu/python/code/wordAnalysis")
 reload(sys)
 sys.setdefaultencoding('utf8') 
 import numpy as np

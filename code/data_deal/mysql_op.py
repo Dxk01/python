@@ -5,7 +5,7 @@
 
 import MySQLdb
 import sys
-sys.path.append("/home/spark/anqu/code/Tools")
+sys.path.append("/home/spark/anqu/python/code/Tools")
 reload(sys)
 sys.setdefaultencoding("utf8") 
 import chinese
