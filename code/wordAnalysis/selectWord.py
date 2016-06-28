@@ -123,6 +123,17 @@ class selectWord():
 		self.mysql.excute("drop view word_view")
 		return BSSP_re
 
+	def selectKeyWord(self,mainKeyWord):
+		sql = "select cluster from wordSelectFeature where word = \'%s\'"%mainKeyWord
+		resault = self.mysql.getWordPriority(sql)
+		if len(resault) > 0:
+			resault = resault[0][0]
+			sql = "select word,priority,searchCount,cluster from wordSelectFeature where cluster = %d order by priority desc limit 15"%resault
+			Key_word = self.mysql.getWordPriority(sql)
+			for word in Key_word:
+				print word[0],word[1],word[2],word[3]
+
+
 	#将查询结果写入文件
 	def write(self,fp,word_list):
 		for words in word_list:
@@ -192,7 +203,8 @@ def main():
 	# for words in word_list:
 	# 	for word in words:
 	# 		print word[0],word[1],word[2],word[3]
-	SelectWord.find()
+	# SelectWord.find()
+	SelectWord.selectKeyWord("策略游戏")
 
 if __name__ == '__main__':
 	main()
