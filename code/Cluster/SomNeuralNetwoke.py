@@ -39,6 +39,7 @@ class SomNeuralNetwork():
 
 	#单个向量的归一化，
 	def NormalSizeOne(self,Matrix,num):
+		# line = Matrix[num] + self.learn_deep * (val - Matrix[num])
 		Matrix[num,:] = preP.normalize([Matrix[num]],'l2')
 
 	#建立模型初始化参数权值向量矩阵
@@ -69,22 +70,32 @@ class SomNeuralNetwork():
 		return Max_j
 
 	#更新权值向量
-	def updateWeight(self):
-		# self.updateNeighborRadius()
-		pass
+	def updateWeight(self,val):
+		for wi in xrange(len(self.Weight)):
+			line = self.Weight[wi] + self.learn_deep * (val - self.Weight[wi])
+			self.Weight[wi,:] = preP.normalize([line],'l2')
+
+
+
+
 	#训练数据，调整权重向量,自适应聚类
 	def cluster(self,Matrix):
-		pass
+		while self.learn_deep >= self.stop_deep_val:
+			#迭代当前次，更新该次迭代下的权值向量
+			for val in Matrix:
+				index = self.findMaxWeight(val)
+				self.updateWeight()
+			#更新相关的参数
+			self.iter_times += 1
+			self.updateNeighborRadius()
+			self.updateLearn_deep()
+
 
 def main():
 	Som = SomNeuralNetwork()
 	Matrix,wdic = Som.getData()
 
-	unitMat = Som.NormalSize(Matrix)
-	weigth = Som.productWeigth()
-	print weigth
-	# Som.NormalSizeOne(Matrix,0)
-	# print unitMat[0]
+	Som.NormalSizeOne(Matrix,0)
 
 if __name__ == '__main__':
 	main()
