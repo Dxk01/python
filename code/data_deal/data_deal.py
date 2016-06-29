@@ -141,6 +141,7 @@ class data_deal():
 		# return daDic
 		return Matrix,wdic
 
+	#
 	def getDadic(self):
 		Matrix,wdic = self.getMatrix()
 		return  self.mapData(Matrix)

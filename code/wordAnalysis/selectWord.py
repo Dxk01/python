@@ -204,7 +204,7 @@ def main():
 	# 	for word in words:
 	# 		print word[0],word[1],word[2],word[3]
 	# SelectWord.find()
-	SelectWord.selectKeyWord("策略游戏")
+	# SelectWord.selectKeyWord("策略游戏")
 
 if __name__ == '__main__':
 	main()
