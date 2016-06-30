@@ -19,15 +19,19 @@ import numpy as np
 import matplotlib as plot
 from sklearn import preprocessing as preP
 import math
+import selectWord
 
+#自适应神经网络聚类算法
 class SomNeuralNetwork():
 	#初始化
-	def __init__(self,k_cluster=100, neighbor_radius = 5,learn_deep = 1):
+	def __init__(self,k_cluster=100, neighbor_radius = 1.0,learn_deep = 1.0):
 		self.k_cluster = k_cluster
 		self.neighbor_radius = neighbor_radius
+		# self.cur_neighbor_radius = self.neighbor_radius
 		self.learn_deep = learn_deep
-		self.stop_deep_val = learn_deep / 10
-		self.cur_iter_time = 0
+		self.stop_deep_val = learn_deep / 100
+		self.iter_times = 0
+		self.Weight = preP.normalize(np.random.random((self.k_cluster,72)))
 
 	#获取数据
 	def getData(self):
@@ -42,26 +46,23 @@ class SomNeuralNetwork():
 		# line = Matrix[num] + self.learn_deep * (val - Matrix[num])
 		Matrix[num,:] = preP.normalize([Matrix[num]],'l2')
 
-	#建立模型初始化参数权值向量矩阵
-	def initParamater(self,feat_dim = 72):
-		self.Weight = preP.normalize(np.random.random((self.k_cluster,feat_dim)))
-
 	#更新邻域半径
-	def updateNeighborRadius(self,iter_times):
-		self.neighbor_radius = math.pow(math.e, -iter_times)
+	def updateNeighborRadius(self):
+		self.neighbor_radius = self.neighbor_radius /math.e #* math.pow(math.e, -iter_times)
 
 	#更新学习率
-	def updateLearn_deep(self,iter_times):
-		self.learn_deep =  self.neighbor_radius / iter_times
+	def updateLearn_deep(self):
+		self.learn_deep =  self.learn_deep / 2#math.pow(2,iter_times)
 
 	#计算向量内积
-	def calculInnerProduct(self,val,weigth):
+	def calculInnerProduct(self,val,weight):
 		return sum(map(lambda x,y:x*y,val,weight))
 
 	#寻找点积最大的权值向量
 	def findMaxWeight(self,val):
 		Max_j = 0
 		Max_innerProduct = self.calculInnerProduct(val,self.Weight[0])
+		# print Max_innerProduct
 		cur_innerProduct = 0
 		for i in xrange(len(self.Weight)):
 			cur_innerProduct = self.calculInnerProduct(val,self.Weight[i])
@@ -70,32 +71,48 @@ class SomNeuralNetwork():
 		return Max_j
 
 	#更新权值向量
-	def updateWeight(self,val):
+	def updateWeight(self,val,Max_j):
 		for wi in xrange(len(self.Weight)):
-			line = self.Weight[wi] + self.learn_deep * (val - self.Weight[wi])
-			self.Weight[wi,:] = preP.normalize([line],'l2')
-
-
-
+			inner_w = self.calculInnerProduct(self.Weight[wi],self.Weight[Max_j])
+			if 2 - 2 * inner_w < self.neighbor_radius:
+				arf = 1 - (2 - 2*inner_w)/self.neighbor_radius
+				line = self.Weight[wi] + self.learn_deep * arf *(val - self.Weight[wi])
+				self.Weight[wi,:] = preP.normalize([line],'l2')
 
 	#训练数据，调整权重向量,自适应聚类
 	def cluster(self,Matrix):
+		resault_list = []
+		print '样本数：',len(Matrix)
+		print "阀值：",self.stop_deep_val
+		print "strart ......"
 		while self.learn_deep >= self.stop_deep_val:
+			resault = []
 			#迭代当前次，更新该次迭代下的权值向量
+			# s_time = time.time()
 			for val in Matrix:
 				index = self.findMaxWeight(val)
-				self.updateWeight()
+				resault.append(index)
+				self.updateWeight(val,index)
+			# e_time = time.time()
+			# print "Spend time %4.2lf s"%(e_time - s_time)
 			#更新相关的参数
+			resault_list.append(resault)
 			self.iter_times += 1
 			self.updateNeighborRadius()
 			self.updateLearn_deep()
+			# print "Current   R :",self.neighbor_radius,"Learn_deep : ",self.learn_deep
+		return resault_list[len(resault_list)-1]
 
 
 def main():
 	Som = SomNeuralNetwork()
 	Matrix,wdic = Som.getData()
-
-	Som.NormalSizeOne(Matrix,0)
+	# Som.findMaxWeight(Matrix[0])
+	resault = Som.cluster(Matrix)
+	# resault = []
+	print len(set(resault))
+	selectWord.selectWord().writerObj(resault,'Som_resault.txt')
+	# Som.NormalSizeOne(Matrix,0)
 
 if __name__ == '__main__':
 	main()
