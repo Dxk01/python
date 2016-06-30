@@ -103,15 +103,40 @@ class SomNeuralNetwork():
 			# print "Current   R :",self.neighbor_radius,"Learn_deep : ",self.learn_deep
 		return resault_list[len(resault_list)-1]
 
+	#非自适应的神经网络学习
+	def unLearncluster(self,Matrix):
+		resault_list = []
+		print '样本数：',len(Matrix)
+		print "阀值：",self.stop_deep_val
+		print "strart ......"
+		while self.learn_deep >= self.stop_deep_val:
+			resault = []
+			#迭代当前次，更新该次迭代下的权值向量
+			# s_time = time.time()
+			for val in Matrix:
+				index = self.findMaxWeight(val)
+				resault.append(index)
+				self.Weight[index,:] = preP.normalize([self.Weight[index]],'l2')
+			# e_time = time.time()
+			# print "Spend time %4.2lf s"%(e_time - s_time)
+			#更新相关的参数
+			resault_list.append(resault)
+			self.iter_times += 1
+			self.updateNeighborRadius()
+			self.updateLearn_deep()
+			# print "Current   R :",self.neighbor_radius,"Learn_deep : ",self.learn_deep
+		return resault_list[len(resault_list)-1]
+
 
 def main():
 	Som = SomNeuralNetwork()
-	Matrix,wdic = Som.getData()
+	# Matrix,wdic = Som.getData()
 	# Som.findMaxWeight(Matrix[0])
-	resault = Som.cluster(Matrix)
+	# resault = Som.unLearncluster(Matrix)
 	# resault = []
-	print len(set(resault))
-	selectWord.selectWord().writerObj(resault,'Som_resault.txt')
+	# print len(set(resault))
+	# selectWord.selectWord().writerObj(resault,'Som_resault.txt')
+	resault = selectWord.selectWord().readObj('Som_resault.txt')
 	# Som.NormalSizeOne(Matrix,0)
 
 if __name__ == '__main__':

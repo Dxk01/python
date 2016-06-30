@@ -21,6 +21,7 @@ import mysql_op
 import myself_cluster
 import particeple
 import wordStatic
+import selectWord
 
 class Cluster_K_Means():
 	def __init__(self):
@@ -129,7 +130,7 @@ class Cluster_K_Means():
 		# clusterk_means.writer_to_LocalFile(word_cluster_resault,1)
 
 		# # mini k-means method
-		secResault = clusterk_means.cluster_mini_k_means(Matrix)
+		# secResault = clusterk_means.cluster_mini_k_means(Matrix)
 		# word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
 		# clusterk_means.writer_to_LocalFile(word_cluster_resault)
 		
@@ -139,16 +140,20 @@ class Cluster_K_Means():
 		# clusterk_means.writer_to_LocalFile(word_cluster_resault)
 		# print "get classfacation : ",cla_num
 
+
+
+
+
 def main():
 	clusterk_means = Cluster_K_Means()
 	Matrix,Iddic = clusterk_means.getData()
 	print len(Matrix)
-	# k-means method
+	# # k-means method
 	# resualt = clusterk_means.cluster_k_means(Matrix)
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
 	# clusterk_means.writer_to_LocalFile(word_cluster_resault,1)
 
-	# # mini k-means method
+	# mini k-means method
 	secResault = clusterk_means.cluster_mini_k_means(Matrix)
 	word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
 	clusterk_means.writer_to_LocalFile(word_cluster_resault)
@@ -158,6 +163,13 @@ def main():
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
 	# clusterk_means.writer_to_LocalFile(word_cluster_resault)
 	# print "get classfacation : ",cla_num
+
+	# #SOM自适应算法结果
+	# resualt = selectWord.selectWord().readObj("Som_resault.txt")
+	# # print len(resualt)
+	# print len(set(resualt))
+	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
+	# clusterk_means.writer_to_LocalFile(word_cluster_resault)
 
 
 
