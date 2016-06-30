@@ -2,7 +2,7 @@
 # _*_ coding:utf-8 _*_
 # Writer : lgy
 # dateTime : 2016-06-29
-# 功能 ：SOM自适应神经网络聚类算法实现
+# 功能 ：SOM自适应神经网络聚类算法实现，低效率是主要问题
 
 import sys
 sys.path.append("/home/spark/anqu/python/code/data_deal")

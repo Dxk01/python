@@ -41,9 +41,12 @@ class selectWord():
 		#加载分析结果
 		data = self.readObj('data.txt')
 		similarity = self.readObj('similarity.txt')
+		#/home/spark/anqu/python/code/Cluster/Som_
 		resault = self.readObj('resault.txt')
 		#写入数据库
 		print len(data)
+		print len(similarity)
+		print len(resault)
 		# self.mysql = mysql_op.mysql_op()
 		mysql = mysql_op.mysql_op()
 		mysql.excute("delete from wordSelectFeature")

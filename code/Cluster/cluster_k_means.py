@@ -153,10 +153,10 @@ def main():
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
 	# clusterk_means.writer_to_LocalFile(word_cluster_resault,1)
 
-	# mini k-means method
-	secResault = clusterk_means.cluster_mini_k_means(Matrix)
-	word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
-	clusterk_means.writer_to_LocalFile(word_cluster_resault)
+	# # mini k-means method
+	# secResault = clusterk_means.cluster_mini_k_means(Matrix)
+	# word_cluster_resault = clusterk_means.mapResault(secResault,Iddic)
+	# clusterk_means.writer_to_LocalFile(word_cluster_resault)
 	
 	# # fuzzy self-organizing map Neural Network method
 	# cla_num,resualt = myself_cluster.m_cluster_Som().cluster(Matrix)

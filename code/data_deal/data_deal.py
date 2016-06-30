@@ -156,7 +156,7 @@ class data_deal():
 def main():
 	data_d = data_deal()
 	mat = data_d.getMatrix()
-	# print mat
+	print len(mat[0])
 	# data = data_d.getWordPrioandSearchC()
 
 if __name__ == '__main__':
