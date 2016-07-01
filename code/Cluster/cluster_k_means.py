@@ -120,6 +120,7 @@ class Cluster_K_Means():
 			sql = "insert into cluster_resault values(%d,%s)"%(line,data)
 			print sql
 			mysql.excute(sql)
+			
 	def run(self):
 		clusterk_means = Cluster_K_Means()
 		Matrix,Iddic = clusterk_means.getData()
@@ -140,9 +141,12 @@ class Cluster_K_Means():
 		# clusterk_means.writer_to_LocalFile(word_cluster_resault)
 		# print "get classfacation : ",cla_num
 
-
-
-
+	#获取聚类结果
+	def getClusterResault(self):
+		Matrix,Iddic = self.getData()
+		resualt = self.cluster_k_means(Matrix)
+		word_cluster_resault = self.mapResault(resualt,Iddic)
+		return word_cluster_resault
 
 def main():
 	clusterk_means = Cluster_K_Means()
@@ -170,9 +174,6 @@ def main():
 	# print len(set(resualt))
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)
 	# clusterk_means.writer_to_LocalFile(word_cluster_resault)
-
-
-
 
 if __name__ == '__main__':
 	main()

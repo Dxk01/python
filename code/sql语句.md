@@ -5,8 +5,10 @@ select * from wordSelectFeature order by priority desc , searchCount desc group 
 
 select * from wordSelectFeature where searchCount < 5000 order by priority desc , searchCount desc limit 100;
 
-select * from wordSelectFeature where word like '陌陌';
+<!-- select * from wordSelectFeature where word like '陌陌'; -->
 select * from wordSelectFeature where group by cluster order by priority desc , searchCount desc limit 100;
+
+select word from wordSelectFeature where group  
 
 #创建SOM分析结果表
 create table SOMwordSelectFeature (word varchar(255),priority int,searchCount int,relevancy float,cluster int);
