@@ -56,6 +56,9 @@ class combine_cluster():
 		sta = False
 		count = 0
 		combine_cluster_re = []
+		if len(sort_list) < num:
+			num = len(sort_list)
+		print len(sort_list)
 		for sort in sort_list:
 			if count < num:
 				resault = []
@@ -73,10 +76,9 @@ class combine_cluster():
 
 def main():
 	Combine_Cluster = combine_cluster()
-	# Combine_Cluster.getData()
 	SelectWord = selectWord.selectWord()
 	cluster_resault = SelectWord.readObj("cluster_resault.txt")
-	# Combine_Cluster.arrange(cluster_resault)
+	
 	sort_list = Combine_Cluster.sort(cluster_resault)
 	com_resault = Combine_Cluster.combine_cluster(sort_list,5)
 	SelectWord.getBetterPriorityWord(com_resault,20)

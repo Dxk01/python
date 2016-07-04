@@ -34,14 +34,14 @@ class Cluster_K_Means():
 		return mat,Iddic
 
 	#K-Means,返回聚类结果
-	def cluster_k_means(self,mat):
-		resualt = KMeans(n_clusters=200,random_state=200).fit_predict(mat)
+	def cluster_k_means(self,mat,k=100):
+		resualt = KMeans(n_clusters=k,random_state=200).fit_predict(mat)
 		return resualt
 
 	# mini batch K-Means 聚类 返回聚类结果
-	def cluster_mini_k_means(self,mat):
+	def cluster_mini_k_means(self,mat,k=100):
 		# print mat
-		return MiniBatchKMeans(n_clusters=100,random_state=400,init_size=6000).fit_predict(mat)
+		return MiniBatchKMeans(n_clusters=k,random_state=400,init_size=6000).fit_predict(mat)
 
 	#聚类结果与词条映射
 	def mapResault(self,resualt,Iddic):
