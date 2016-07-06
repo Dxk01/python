@@ -7,8 +7,7 @@ import sys
 sys.path.append("/home/spark/anqu/python/code/Cluster")
 sys.path.append("/home/spark/anqu/python/code/data_deal")
 sys.path.append("/home/spark/anqu/python/code/Tools")
-# sys.path.append("/home/spark/anqu/python/code")
-
+sys.path.append("/home/spark/anqu/python/code/linkWord")
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -21,6 +20,8 @@ from calculSimilarity import similarity
 from combine_cluster import combine_cluster
 import os 
 from mysql_op import mysql_op
+from linkWord import thinkWord
+from particeple import participle
 
 class clusterByCompleteObject():
 	# init 
@@ -108,6 +109,7 @@ class clusterByCompleteObject():
 				print len(resualt),len(word_list),len(similarity_re)
 			#获取聚类结果
 			cluster_resault = self.cluster_Method.mapResault(resualt,Iddic)
+			#写入聚类结果，避免下一次相同请求的重复计算
 			select.writeObj(complete_Ids,"complete_Ids.txt")
 			select.writeObj(cluster_resault,"cluster_resault.txt")
 			return cluster_resault
@@ -140,8 +142,18 @@ def main():
 	# select.getBetterPriorityWord(com_resault,30)
 	# select.getBetterClassWord(com_resault,30)
 
-	select.getTopKKeyWord(topWord,combine_num)
-	select.getTopKClassWord(topWord,combine_num)
+	# select.getTopKKeyWord(topWord,combine_num)
+	clusterWord = select.getTopKClassWord(topWord,combine_num)
+	thinkword = thinkWord()
+	clusterWord = thinkword.getParticepleWord(clusterWord)
+	# print type(clusterWord[0])
+	# for cluster in clusterWord:
+	particiPle = participle(10)
+	staticWordCluster = particiPle.staticAllClusters(clusterWord)
+	for wordCluster in staticWordCluster:
+		for word in wordCluster:
+			print word[0],word[1]
+		print ''
 
 if __name__ == '__main__':
 	main()

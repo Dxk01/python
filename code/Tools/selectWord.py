@@ -17,6 +17,7 @@ import calculSimilarity
 import chinese
 import cPickle as pickle
 import time
+from particeple import participle
 
 class selectWord():
 	"""docstring for ClassName"""
@@ -121,7 +122,14 @@ class selectWord():
 			data = mysql.getWordPriority('select * from wordSelectFeature where cluster =%d and searchCount > 5500 order by priority desc limit %d'%(cluster,topWord))
 			Datas.append(data)
 		self.write_to_local(Datas,topWord,'ClassWord',2)
-		# return Datas
+		return Datas
+
+	#获取品类词的联想词
+
+	def getClassWordDiscribe(self,Datas):
+		for data in Datas:
+			pass
+
 
 	#获取当前关键字前Top K聚类中的维度词的结果
 	def getTopKKeyWord(self,topWord=20,top_K=4):
