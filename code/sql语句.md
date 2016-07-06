@@ -12,3 +12,6 @@ select word from wordSelectFeature where group
 
 #创建SOM分析结果表
 create table SOMwordSelectFeature (word varchar(255),priority int,searchCount int,relevancy float,cluster int);
+
+#竞品ID样例
+'443354861','799406905','457517348','453640300','615187629','471802217','521922264','389801252','847334708','592331499','606080169','611129419','825355393','608188610','933456837','599534650'

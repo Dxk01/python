@@ -92,7 +92,7 @@ class selectWord():
 			str_cluster = ''
 			for cluster_id in cluster:
 				str_cluster += str(cluster_id)+','
-			str_cluster += str(0)
+			str_cluster += '-1'
 			sql = 'select * from wordSelectFeature where cluster in (%s) and searchCount < 1500 order by priority desc limit %d'%(str_cluster,topWord)
 			mysql = mysql_op.mysql_op()
 			data = mysql.getWordPriority(sql)
@@ -112,6 +112,29 @@ class selectWord():
 			datas.append(data)
 		self.write_to_local(datas,topWord,'ClassWord',2)
 
+	#获得当前品类词前Top K的维度词结果
+	def getTopKClassWord(self,topWord=20,top_K=4):
+		mysql = mysql_op.mysql_op()
+		top_kClusters = mysql.select("select cluster from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
+		Datas = []
+		for cluster in top_kClusters:
+			data = mysql.getWordPriority('select * from wordSelectFeature where cluster =%d and searchCount > 5500 order by priority desc limit %d'%(cluster,topWord))
+			Datas.append(data)
+		self.write_to_local(Datas,topWord,'ClassWord',2)
+		# return Datas
+
+	#获取当前关键字前Top K聚类中的维度词的结果
+	def getTopKKeyWord(self,topWord=20,top_K=4):
+		mysql = mysql_op.mysql_op()
+		top_kClusters = mysql.select("select cluster from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
+		Datas = []
+		for cluster in top_kClusters:
+			data = mysql.getWordPriority('select * from wordSelectFeature where cluster =%d and searchCount < 2000 order by priority desc limit %d'%(cluster,topWord))
+			Datas.append(data)
+			for word in data:
+				print word[0]
+		self.write_to_local(Datas,topWord,'keyword',1)
+
 	#将推荐的结果写入到文件
 	def write_to_local(self,Datas,topWord = 20,filename='keyword',type=1):
 		# filepath = "/home/spark/anqu/analysisResault/"
@@ -126,9 +149,12 @@ class selectWord():
 		else :
 			fp.write("品类词的推荐词：\n")
 		for KeyWords in Datas:
-			fp.write("第  %d  维度       Top  %d 关键词\n"%(count,topWord))
+			fp.write("第  %d  维度       Top  %d 关键词        Cluster : %d\n"%(count,topWord,KeyWords[0][4]))
 			for word in KeyWords:
-				fp.write(word[0] + "  " +str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n")
+				if type == 2:
+					fp.write(word[0] + " ")  #+str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n"
+				else :
+					fp.write(word[0] + ',')
 			count += 1
 			fp.write("\n\n\n")
 		fp.close()
@@ -148,6 +174,7 @@ class selectWord():
 
 def main():
 	SelectWord = selectWord()
+	# SelectWord.getTopKClassWord()
 
 	# SelectWord.selectWord()
 	# SelectWord.insert_analysis_data()
