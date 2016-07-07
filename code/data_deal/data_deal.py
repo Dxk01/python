@@ -12,6 +12,7 @@ sys.setdefaultencoding('utf8')
 import mysql_op
 import numpy as np
 import time
+from chinese import chinese
 # 数据处理
 class data_deal():
 	#初始化
@@ -94,6 +95,28 @@ class data_deal():
 				count += 1
 		return wdic,genredic
 
+	#获取联想词的类别标签信息
+	def getThinkWordGenre(self,thinkWord):
+		data_thinkWord = []
+		for word in thinkWord:
+			sql = "select genre from ansearchApp where word = \'%s\'"%word
+			word_genre = self.mysql.select(sql)
+			data_thinkWord.append(word_genre)
+		return data_thinkWord
+
+	#获取联想词的词热和searchCount,genre等信息
+	def getThinkWordPriorityAndSearchC(self,thinkWord):
+		data_thinkWord = []
+		chi = chinese()
+		for word in thinkWord:
+			if chi.is_contains(word):
+				sql = "select word,priority,searchCount,genre from ansearchApp where word =\"%s\""%word
+			else:
+				sql = "select word,priority,searchCount,genre from ansearchApp where word =\'%s\'"%word
+			word_prio_search = self.mysql.getWordPriority(sql)
+			data_thinkWord.append(word_prio_search)
+		return data_thinkWord
+
 	# def mapwordAgenreOnAll(self,word_list):
 	# 	wdic = {}
 	# 	count = 0
@@ -171,8 +194,9 @@ class data_deal():
 	#获取数据记录根据竞品ID
 	def getDataByID(self,IDs):
 		word_list = []
-		for ID in list(IDs):
-			sql = "select distinct(word),priority,searchCount,genre from ansearchApp where searchApp like \'%"+ID +"%\'"
+		for ID in IDs:
+			sql = "select distinct(word),priority,searchCount,genre from searchApp where searchApp like \'%"+ID +"%\'"
+			print sql
 			data = self.mysql.getWordPriority(sql)
 			word_list.extend(data)
 		return list(set(word_list))

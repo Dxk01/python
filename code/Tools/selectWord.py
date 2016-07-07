@@ -130,7 +130,6 @@ class selectWord():
 		for data in Datas:
 			pass
 
-
 	#获取当前关键字前Top K聚类中的维度词的结果
 	def getTopKKeyWord(self,topWord=20,top_K=4):
 		mysql = mysql_op.mysql_op()

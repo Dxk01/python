@@ -9,6 +9,7 @@ class chinese():
 	def __init__(self):
 		pass
 
+	#判断是都包含中文
 	def is_chinese(self,c_str):
 		zhPattern = re.compile(u'[\u4e00-\u9fa5]+')
 		#一个小应用，判断一段文本中是否包含简体中：
@@ -22,6 +23,7 @@ class chinese():
     			# print u'没有包含中文'
     			return False
 
+    	#是否包含单引号
     	def is_contains(self,c_str):
     		an = re.compile(u'\'')
     		match = an.search(c_str)

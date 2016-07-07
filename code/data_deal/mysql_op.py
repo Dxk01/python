@@ -24,6 +24,7 @@ class mysql_op():
 		else :
 			return "insert into ansearchApp values(\"%s\",%d,%d,%d)"%line
 
+	#过滤searchApp表中的非汉语词
 	def selectA(self):
 		resault = self.cur.execute("select word,priority ,searchCount  ,genre ,type,time from searchApp")
 		# data = self.cur.fetchall()
@@ -35,16 +36,22 @@ class mysql_op():
 		#create table ansearchApp(word varchar(255),priority int,searchCount int ,genre varchar(255),type int,time int);
 		anS_conn = MySQLdb.connect(host = 'localhost',user='root',passwd='root',db = 'mysql',port=3306,charset='utf8')
 		anS_cur = anS_conn.cursor()
-		print self.cur.rowcount
+		# print self.cur.rowcount
+		word = {}
 		for i in  xrange(self.cur.rowcount):#self.cur.fetchall():
 			line = self.cur.fetchone()
+			if line[0] in word:
+				continue
+			word.setdefault(line[0])
 			if chin.is_chinese(line[0]) :
 				data_l.append(line)
+				if line[0] == '轻':
+					print 1
 				if chin.is_contains(line[0]):
 					sql = "insert into ansearchApp values(\"%s\",%d,%d,\'%s\',%d,%d)"%line
 				else : 
 					sql = "insert into ansearchApp values(\'%s\',%d,%d,\'%s\',%d,%d)"%line
-				print sql
+				# print sql
 				anS_cur.execute(sql)
 				anS_conn.commit()
 

@@ -73,14 +73,13 @@ class clusterByCompleteObject():
 		completeId_list = []
 		for cid in complete_Ids:
 			sql = "select topApp from topApp where topApp like \'%"+cid+"%\' order by time asc limit 1 "
-			print sql
+			# print sql
 			complete_Ids = mysql.select(sql)[0]
 			completeId_list += complete_Ids.split(",")[0:16]
 		# print completeId_list
 		return list(set(completeId_list))
 
 	#获得当前聚类相似度较高的前 top K 各聚类信息作为维度
-	# def get
 
 	#测试代码
 	def run(self,complete_Ids):
@@ -118,42 +117,40 @@ class clusterByCompleteObject():
 			cluster_resault = select.readObj("cluster_resault.txt")
 			return cluster_resault
 
-	#
-
 def main():
 	k = 8
 	combine_num = 8
 	topWord = 100
 	cluster = clusterByCompleteObject(k)
-	complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
-	select = selectWord()
-	# complete_Ids = ('443354861','799406905','457517348','453640300','615187629','471802217','521922264','389801252','847334708','592331499','606080169','611129419','825355393','608188610','933456837','599534650')
-	# complete_Ids = ('890351673','708214926','685941739','671539572','645849323','658788107','652039347','880619256','664422011','695688524','743800927','632344249','903831702','576396994','894954694','820357891')
+	# complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
+	# select = selectWord()
+	# # complete_Ids = ('443354861','799406905','457517348','453640300','615187629','471802217','521922264','389801252','847334708','592331499','606080169','611129419','825355393','608188610','933456837','599534650')
+	# # complete_Ids = ('890351673','708214926','685941739','671539572','645849323','658788107','652039347','880619256','664422011','695688524','743800927','632344249','903831702','576396994','894954694','820357891')
 	
-	# # cluster_resault = select.readObj('cluster_resault.txt')
-	# # key_len = len(cluster_resault.keys())
-	# # print key_len
-	# # if len(cluster_resault.keys()) != k:	
-	cluster_resault = cluster.run(complete_Ids)
-	# select.writeObj(cluster_resault,'cluster_resault.txt')
-	# combine = combine_cluster()
-	# sort_list = combine.sort(cluster_resault)
-	# com_resault = combine.combine_cluster(sort_list,combine_num)
-	# select.getBetterPriorityWord(com_resault,30)
-	# select.getBetterClassWord(com_resault,30)
+	# # # cluster_resault = select.readObj('cluster_resault.txt')
+	# # # key_len = len(cluster_resault.keys())
+	# # # print key_len
+	# # # if len(cluster_resault.keys()) != k:	
+	# cluster_resault = cluster.run(complete_Ids)
+	# # select.writeObj(cluster_resault,'cluster_resault.txt')
+	# # combine = combine_cluster()
+	# # sort_list = combine.sort(cluster_resault)
+	# # com_resault = combine.combine_cluster(sort_list,combine_num)
+	# # select.getBetterPriorityWord(com_resault,30)
+	# # select.getBetterClassWord(com_resault,30)
 
-	# select.getTopKKeyWord(topWord,combine_num)
-	clusterWord = select.getTopKClassWord(topWord,combine_num)
-	thinkword = thinkWord()
-	clusterWord = thinkword.getParticepleWord(clusterWord)
-	# print type(clusterWord[0])
-	# for cluster in clusterWord:
-	particiPle = participle(10)
-	staticWordCluster = particiPle.staticAllClusters(clusterWord)
-	for wordCluster in staticWordCluster:
-		for word in wordCluster:
-			print word[0],word[1]
-		print ''
+	# # select.getTopKKeyWord(topWord,combine_num)
+	# clusterWord = select.getTopKClassWord(topWord,combine_num)
+	# thinkword = thinkWord()
+	# clusterWord = thinkword.getParticepleWord(clusterWord)
+	# # print type(clusterWord[0])
+	# # for cluster in clusterWord:
+	# particiPle = participle(10)
+	# staticWordCluster = particiPle.staticAllClusters(clusterWord)
+	# for wordCluster in staticWordCluster:
+	# 	for word in wordCluster:
+	# 		print word[0],word[1]
+	# 	print ''
 
 if __name__ == '__main__':
 	main()
