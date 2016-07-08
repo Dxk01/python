@@ -97,6 +97,7 @@ class mysql_op():
 	def getWordPriority(self,sql):
 		try :
 			# sql = 'select priority from %s where type = 1'%table
+			# print sql
 			self.cur.execute(sql)
 			data = self.cur.fetchall()
 			data_l = []
@@ -113,7 +114,7 @@ def main():
 	# for line in data:
 		# print line[0],line[1],line[2]
 	# 数据去重，过滤速度慢
-	mysql.selectA()
+	# mysql.selectA()
 
 if __name__ == '__main__':
 	main()

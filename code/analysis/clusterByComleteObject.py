@@ -7,7 +7,7 @@ import sys
 sys.path.append("/home/spark/anqu/python/code/Cluster")
 sys.path.append("/home/spark/anqu/python/code/data_deal")
 sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/linkWord")
+sys.path.append("/home/spark/anqu/python/code/Word")
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -20,7 +20,7 @@ from calculSimilarity import similarity
 from combine_cluster import combine_cluster
 import os 
 from mysql_op import mysql_op
-from linkWord import thinkWord
+from thinkWord import thinkWord
 from particeple import participle
 
 class clusterByCompleteObject():
@@ -68,16 +68,15 @@ class clusterByCompleteObject():
 		pass
 
 	#获取某一游戏的top K 竞品
-	def getCompleteProductId(self,complete_Ids,top_k = 100):
+	def getCompleteProductId(self,complete_Ids,top_k = 15):
 		mysql = mysql_op()
 		completeId_list = []
 		for cid in complete_Ids:
 			sql = "select topApp from topApp where topApp like \'%"+cid+"%\' order by time asc limit 1 "
-			# print sql
 			complete_Ids = mysql.select(sql)[0]
-			completeId_list += complete_Ids.split(",")[0:16]
-		# print completeId_list
-		return list(set(completeId_list))
+			completeId_list += complete_Ids.split(",")[0:top_k]
+			completeId_list.append(cid)
+		return completeId_list
 
 	#获得当前聚类相似度较高的前 top K 各聚类信息作为维度
 
@@ -122,7 +121,8 @@ def main():
 	combine_num = 8
 	topWord = 100
 	cluster = clusterByCompleteObject(k)
-	# complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
+	complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
+	# print complete_Ids
 	# select = selectWord()
 	# # complete_Ids = ('443354861','799406905','457517348','453640300','615187629','471802217','521922264','389801252','847334708','592331499','606080169','611129419','825355393','608188610','933456837','599534650')
 	# # complete_Ids = ('890351673','708214926','685941739','671539572','645849323','658788107','652039347','880619256','664422011','695688524','743800927','632344249','903831702','576396994','894954694','820357891')

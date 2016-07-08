@@ -25,11 +25,11 @@ class thinkWord():
 		mysql = mysql_op()
 		chi = chinese()
 		if chi.is_contains(word):
-			sql = 'select * from hintWord where hintword=\"%s\"'%word
+			sql = 'select word from hintWord where hintword=\"%s\"'%word
 		else:
-			sql = 'select * from hintWord where hintword=\'%s\''%word
+			sql = 'select word from hintWord where hintword=\'%s\''%word
 		resault = mysql.select(sql)
-		return list(set(resault))
+		return resault
 
 	#当前聚类下的联想词的获得
 	def getThinkWordCluster(self,cluster_Words):
@@ -39,13 +39,15 @@ class thinkWord():
 			# print 1
 		#去除联想词中的非中文词
 		chi = chinese()
+		word_re = []
 		for word in thinkWords:
-			if chi.is_chinese(word) == False:
-				thinkWords.remove(word)
+			# print word
+			if chi.is_chinese(word):
+				word_re.append(word)
 				continue
 			if word in cluster_Words:
-				thinkWords.remove(word)
-		return list(set(thinkWords))
+				word_re.append(word)
+		return word_re
 
 	#获取联想词的词热等信息数据
 	
@@ -61,7 +63,9 @@ class thinkWord():
 		return clusterS
 def main():
 	tWord = thinkWord()
-	tWord.getThinkWord('微信')
+	# re = tWord.getThinkWord('微信')
+	re = tWord.getThinkWordCluster(['微信',])
+	print re
 
 if __name__ == '__main__':
 	main()

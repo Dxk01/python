@@ -6,6 +6,7 @@
 import sys
 sys.path.append("/home/spark1/python/")
 sys.path.append("/home/spark/anqu/python/code")
+sys.path.append("/home/spark/anqu/python/code/Tools")
 reload(sys)
 sys.setdefaultencoding('utf8') 
 
@@ -13,6 +14,7 @@ import mysql_op
 import numpy as np
 import time
 from chinese import chinese
+# from selectWord import selectWord
 # 数据处理
 class data_deal():
 	#初始化
@@ -80,6 +82,7 @@ class data_deal():
 		genredic = {}
 		length = len(word)
 		leng = len(genre)
+		# print genre
 		# print length,leng
 		for i in xrange(length):
 			if word[i] in wdic:
@@ -114,29 +117,30 @@ class data_deal():
 			else:
 				sql = "select word,priority,searchCount,genre from ansearchApp where word =\'%s\'"%word
 			word_prio_search = self.mysql.getWordPriority(sql)
-			data_thinkWord.append(word_prio_search)
+			# print type(word_prio_search)
+			data_thinkWord += word_prio_search
 		return data_thinkWord
 
-	# def mapwordAgenreOnAll(self,word_list):
-	# 	wdic = {}
-	# 	count = 0
-	# 	genredic = {}
-	# 	length = len(word)
-	# 	# leng = len(genre)
-	# 	# print length,leng
-	# 	for i in xrange(length):
-	# 		if word[i] in wdic:
-	# 			# print 'info'
-	# 			Id = wdic.get(word[i])
-	# 			data = genredic.get(Id)
-	# 			data = data +','+genre[i]  #list(set(data.extend(genre[i])))
-	# 			genredic.pop(Id)
-	# 			genredic.setdefault(Id,data)
-	# 		else :
-	# 			wdic.setdefault(word[i],count)
-	# 			genredic.setdefault(count,genre[i])
-	# 			count += 1
-	# 	return wdic,genredic
+	def mapwordAgenreOnAll(self,word_list):
+		wdic = {}
+		count = 0
+		genredic = {}
+		length = len(word)
+		# leng = len(genre)
+		# print length,leng
+		for i in xrange(length):
+			if word[i] in wdic:
+				# print 'info'
+				Id = wdic.get(word[i])
+				data = genredic.get(Id)
+				data = data +','+genre[i]  #list(set(data.extend(genre[i])))
+				genredic.pop(Id)
+				genredic.setdefault(Id,data)
+			else :
+				wdic.setdefault(word[i],count)
+				genredic.setdefault(count,genre[i])
+				count += 1
+		return wdic,genredic
 
 	#获取去重后的GenreID 列表
 	def getGenreIDlist(self,genre):
@@ -144,6 +148,7 @@ class data_deal():
 
 	#构建分析矩阵
 	def buildMatrix(self,wdic,gdic,ddic):
+		print len(wdic)
 		n,m = len(wdic),len(ddic)
 		Matrix = np.zeros((n,m))
 		for key in wdic.keys():
@@ -196,9 +201,34 @@ class data_deal():
 		word_list = []
 		for ID in IDs:
 			sql = "select distinct(word),priority,searchCount,genre from searchApp where searchApp like \'%"+ID +"%\'"
-			print sql
+			# print sql
 			data = self.mysql.getWordPriority(sql)
 			word_list.extend(data)
+
+		chin = chinese()
+		word_re = []
+		for word in word_list:
+			if chin.is_chinese(word[0]):
+				word_re.append(word)
+				# word_list.remove(word)
+		return word_re
+
+	#词的去重
+	def delRepeatWord(self,word_list):
+		word_dic = {}
+		# word_re = []
+		chi = chinese()
+		for word in word_list:
+			if word[0] in word_dic:
+				word_list.remove(word)
+				continue
+			else:
+				if chi.is_chinese(word[0]):
+					word_dic.setdefault(word[0])
+				else:
+					word_list.remove(word)
+				
+
 		return list(set(word_list))
 
 	#devide data 
@@ -220,14 +250,31 @@ class data_deal():
 		return data
 
 
-	#计算分析矩阵
+	#计算分析矩阵,和
 	def calMatrix(self,data):
+		# print data[0]
 		gdata = self.getCategory() 
 		ddic = self.mapgenreID(gdata)
 		wdic,gdic = self.mapwordAgenre(data[0],data[3])
 		Matrix = self.buildMatrix(wdic,gdic,ddic)
 		return Matrix,wdic
 
+	#计算分析矩阵
+	def calMatrixByWordNews(self,words):
+		gdata = self.getCategory()
+		ddic = self.mapgenreID(gdata)
+		return self.mapwordAgenerDic(words,ddic)
+
+	#映射字典构建矩阵
+	def mapwordAgenerDic(self,words,ddic):
+		Matrix = np.zeros((len(words),len(ddic)))
+		# print len(ddic)
+		for i in xrange(len(words)):
+			glist = words[i][3].split(',')
+			for p_l in glist:
+				p = ddic[long(p_l)]
+				Matrix[i][p] = 1
+		return Matrix
 
 	#依据竞品ID 获取关键词
 	def getKeyWordDataByIds(self,complete_Ids):
@@ -255,9 +302,12 @@ def main():
 	data_d = data_deal()
 	# mat = data_d.getMatrix()
 	# print len(mat[0])
-	# word_list = data_d.getDataByID(('593499239','399353136','1003165584','737310995','1086911361','1080228178','1067238109','1017226508','909532141','903782554','914791167','952503776658','1070817891','1093026147','1067627594','1069231086'))
-	# # data = data_d.getWordPrioandSearchC()
-	# for word in word_list:
+	# word_list = data_d.getDataByID(('593499239',))
+	# # select = SW()
+	# # select.writeObj(word_list,"word_list.txt")
+	# # word_list = select.readObj("word_list.txt")
+	# data = data_d.getWordPrioandSearchC(word_list)
+	# for word in data:
 	# 	print word[0],word[1]
 
 if __name__ == '__main__':
