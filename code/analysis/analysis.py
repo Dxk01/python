@@ -21,14 +21,13 @@ from selectWord import selectWord
 from cluster_k_means import Cluster_K_Means as CKM
 from calculSimilarity import similarity
 import numpy as np
+from ClassWordExtend import ClassWordExtend as CWD
 
 def getWord(keyWords):
 	words = []
 	for word in keyWords:
 		words.append(word[0])
 	return words
-
-
 
 def main():
 	
@@ -54,14 +53,20 @@ def main():
 	words = getWord(keyWords)
 	# #get think words
 	think = thinkWord()
+	print 1
 	# #real
 	thinkWords = think.getThinkWordCluster(words)
 	select.writeObj(thinkWords,"thinkWords.txt")
+	print 2
+	#获取App 的类别下的关联词
+	cwd = CWD()
+	genreIDs = cwd.getGenreIDByAppId(complete_Ids)
+	cwd_Words = cwd.getKeyWordofClassWord(genreIDs)
+
 	# #for test
 	# thinkWords = select.readObj("thinkWords.txt")
-	# # print len(keyWords)
 	# #获取联想词的信息
-	thinkWordNews = data.getThinkWordPriorityAndSearchC(thinkWords)
+	thinkWordNews = data.getThinkWordPriorityAndSearchC(thinkWords+cwd_Words)
 	all_Words = keyWords + thinkWordNews
 	all_Words = data.delRepeatWord(all_Words)
 	# # #get think words' priority searchCount and genre
