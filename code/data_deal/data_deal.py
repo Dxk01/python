@@ -14,6 +14,8 @@ import mysql_op
 import numpy as np
 import time
 from chinese import chinese
+import MySQLdb
+
 # from selectWord import selectWord
 # 数据处理
 class data_deal():
@@ -110,15 +112,14 @@ class data_deal():
 	#获取联想词的词热和searchCount,genre等信息
 	def getThinkWordPriorityAndSearchC(self,thinkWord):
 		data_thinkWord = []
-		chi = chinese()
-		for word in thinkWord:
-			if chi.is_contains(word):
-				sql = "select word,priority,searchCount,genre from ansearchApp where word =\"%s\""%word
-			else:
-				sql = "select word,priority,searchCount,genre from ansearchApp where word =\'%s\'"%word
-			word_prio_search = self.mysql.getWordPriority(sql)
-			# print type(word_prio_search)
-			data_thinkWord += word_prio_search
+		sql = 'select word,priority,searchCount,genre from ansearchApp'
+		words = self.mysql.getWordPriority(sql)
+		# print words
+		for word in words:
+			if word[0] in thinkWord:
+				data_thinkWord.append(word)
+			# if len(words) == len(thinkWord):
+				# break
 		return data_thinkWord
 
 	def mapwordAgenreOnAll(self,word_list):
@@ -198,20 +199,36 @@ class data_deal():
 
 	#获取数据记录根据竞品ID
 	def getDataByID(self,IDs):
-		word_list = []
-		for ID in IDs:
-			sql = "select distinct(word),priority,searchCount,genre from searchApp where searchApp like \'%"+ID +"%\'"
-			# print sql
-			data = self.mysql.getWordPriority(sql)
-			word_list.extend(data)
-
+		if IDs == None or len(IDs) == 0:
+			return []
+		sql = "select count(word) from searchApp"
+		mysqlconn = MySQLdb.connect(host = 'localhost',user='root',passwd='root',db = 'mysql',port=3306,charset='utf8')
+		mysqlcur = mysqlconn.cursor()
+		re = mysqlcur.execute(sql)
 		chin = chinese()
 		word_re = []
-		for word in word_list:
-			if chin.is_chinese(word[0]):
-				word_re.append(word)
-				# word_list.remove(word)
-		return word_re
+		num = mysqlcur.fetchall()[0][0]
+		# print num
+		blockSize = 10000
+		div = num / 10000 + 1
+		# print div
+		for i in xrange(div):
+			msql = 'select word,searchApp from searchApp limit %d , 10000'%(i*10000)
+			# print msql
+			re = mysqlcur.execute(msql)
+			words = mysqlcur.fetchall()
+			for word in words:
+				if chin.is_chinese(word[0]):
+					appId = word[1].split(',')
+					for  ids in IDs:
+						if ids in appId:
+							# print word[0]
+							word_re.append(word[0])
+							break
+			print 'read ',i,'times'
+			# print len(word_re)
+		# print len(word_re)
+		return  word_re
 
 	#词的去重
 	def delRepeatWord(self,word_list):
@@ -227,8 +244,6 @@ class data_deal():
 					word_dic.setdefault(word[0])
 				else:
 					word_list.remove(word)
-				
-
 		return list(set(word_list))
 
 	#devide data 
@@ -270,6 +285,7 @@ class data_deal():
 		Matrix = np.zeros((len(words),len(ddic)))
 		# print len(ddic)
 		for i in xrange(len(words)):
+			# print words[i]#words[i][3]
 			glist = words[i][3].split(',')
 			for p_l in glist:
 				p = ddic[long(p_l)]
@@ -302,7 +318,8 @@ def main():
 	data_d = data_deal()
 	# mat = data_d.getMatrix()
 	# print len(mat[0])
-	# word_list = data_d.getDataByID(('593499239',))
+	# word_list = data_d.getDataByID([u'333206289', u'724295527', u'1090254952', u'1080608190', u'955253735', u'394075284', u'1046617847', u'1067721155', u'1061531453', u'996509117', '962734163', u'423084029', u'475966832', u'489782456', u'531761928', u'1014227673', u'407925512', u'438865278', u'1076606734', u'429885089', u'453718989', u'1075872386', u'919854496', u'414478124', u'393765873', u'412395632', u'409563112', u'1071403903', u'395893124', u'444934666', u'989673964', u'991018252', '994120614', u'592331499', u'1099554323', '1111594089', u'932299405', u'1042545880', u'1076471738', u'791532221', u'1027688889'])
+	# print len(word_list)
 	# # select = SW()
 	# # select.writeObj(word_list,"word_list.txt")
 	# # word_list = select.readObj("word_list.txt")

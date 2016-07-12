@@ -27,12 +27,12 @@ class ClassWordExtend():
 		mysql = mysql_op()
 		genreIds = []
 		for appid in AppIds:
-			sql = 'select genreID from appInfo where appID=%d'%appid
-			data = mysql.getWordPriority(sql)[0][0]
-			if data == None or len(data) == 0:
-				continue
-			data = data.split(",")
-			genreIds += data
+			sql = 'select genreID from appInfo where appID=%d'%long(appid)
+			data = mysql.select(sql)
+			
+			if data is not None:
+				if len(data) == 0 or data[0] is not None:
+					genreIds.extend(data[0].split(","))
 		return list(set(genreIds))
 
 	#获取类别的下的关键词
@@ -40,7 +40,7 @@ class ClassWordExtend():
 		sql = 'select word,genre from ansearchApp'
 		mysql = mysql_op()
 		words = mysql.getWordPriority(sql)
-		print words[0]
+		# print words[0]
 		word_re = []
 		chi = chinese()
 		for word in words:
@@ -54,6 +54,7 @@ class ClassWordExtend():
 def main():
 	cwd = ClassWordExtend()
 	genreIds = cwd.getGenreIDByAppId([284087761,284124560,284146702])
+	print genreIds
 	word_re = cwd.getKeyWordofClassWord(genreIds)
 	# for word in word_re:
 		# print word

@@ -71,12 +71,17 @@ class clusterByCompleteObject():
 	def getCompleteProductId(self,complete_Ids,top_k = 15):
 		mysql = mysql_op()
 		completeId_list = []
-		for cid in complete_Ids:
-			sql = "select topApp from topApp where topApp like \'%"+cid+"%\' order by time asc limit 1 "
-			complete_Ids = mysql.select(sql)[0]
-			completeId_list += complete_Ids.split(",")[0:top_k]
-			completeId_list.append(cid)
-		return completeId_list
+		sql = 'select topApp from topApp'
+		topAppIds = mysql.select(sql)
+		for complete_id in  complete_Ids:
+			for appIds in topAppIds:
+				appId = appIds.split(",")	
+				# print appId
+				if complete_id in appId:
+					completeId_list += appId[0:top_k]+[complete_id]
+					break
+		# print completeId_list
+		return list(set(completeId_list))
 
 	#获得当前聚类相似度较高的前 top K 各聚类信息作为维度
 
@@ -122,6 +127,7 @@ def main():
 	topWord = 100
 	cluster = clusterByCompleteObject(k)
 	complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
+	print complete_Ids
 	# print complete_Ids
 	# select = selectWord()
 	# # complete_Ids = ('443354861','799406905','457517348','453640300','615187629','471802217','521922264','389801252','847334708','592331499','606080169','611129419','825355393','608188610','933456837','599534650')

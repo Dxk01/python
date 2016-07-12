@@ -45,8 +45,8 @@ class mysql_op():
 			word.setdefault(line[0])
 			if chin.is_chinese(line[0]) :
 				data_l.append(line)
-				if line[0] == '轻':
-					print 1
+				# if line[0] == '轻':
+					# print 1
 				if chin.is_contains(line[0]):
 					sql = "insert into ansearchApp values(\"%s\",%d,%d,\'%s\',%d,%d)"%line
 				else : 
