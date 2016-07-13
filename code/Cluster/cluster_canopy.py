@@ -4,14 +4,11 @@
 # dateTime : 2016-06-15
 
 import sys
-sys.path.append("/home/spark1/python/")
 sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
-# from pyspark import SparkContext as sc
-# from pyspark import SparkConf as sconf
 
-#canopy cluster
 import data_deal
 
 def fun1(x,y):
@@ -102,11 +99,11 @@ class canopy():
 
 def main():
 	cano = canopy()
-	data_d = data_deal.data_deal()
-	data = data_d.getDadic()
-	dataL = data[0:1000]
-	resault = cano.calcuCanopy(dataL,0.95,0.4)
-	print len(resault)
+	# data_d = data_deal.data_deal()
+	# data = data_d.getDadic()
+	# dataL = data[0:1000]
+	# resault = cano.calcuCanopy(dataL,0.95,0.4)
+	# print len(resault)
 
 if __name__ == '__main__':
 	main()

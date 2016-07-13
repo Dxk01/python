@@ -4,8 +4,9 @@
 # dateTime : 2016-06-22
 
 import sys
-sys.path.append("/home/spark/anqu/python/code/Tools")
+sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 import jieba
 from chinese import chinese
@@ -55,10 +56,10 @@ def main():
 	participleW = participle()
 	# words = participleW.participleWord(str_1)
 	# resault = participleW.staticWord(words)
-	resaults = participleW.staticAllClusters(((str_1,),))
-	for resault in resaults:
-		for word in resault:
-			print word[0],word[1]
+	# resaults = participleW.staticAllClusters(((str_1,),))
+	# for resault in resaults:
+	# 	for word in resault:
+	# 		print word[0],word[1]
 	# print str_1
 
 if __name__ == '__main__':

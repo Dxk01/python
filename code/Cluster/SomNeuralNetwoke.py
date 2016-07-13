@@ -5,10 +5,9 @@
 # 功能 ：SOM自适应神经网络聚类算法实现，低效率是主要问题
 
 import sys
-sys.path.append("/home/spark/anqu/python/code/data_deal")
-sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/wordAnalysis")
+sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 
 import time
@@ -121,10 +120,10 @@ class SomNeuralNetwork():
 
 def main():
 	Som = SomNeuralNetwork()
-	Matrix,wdic = Som.getData()
-	Som.findMaxWeight(Matrix[0])
-	resault = Som.unLearncluster(Matrix[0:2000])
-	print len(set(resault))
+	# Matrix,wdic = Som.getData()
+	# Som.findMaxWeight(Matrix[0])
+	# resault = Som.unLearncluster(Matrix[0:2000])
+	# print len(set(resault))
 	# selectWord.selectWord().writerObj(resault,'Som_resault.txt')
 	# resault = selectWord.selectWord().readObj('Som_resault.txt')
 	# Som.NormalSizeOne(Matrix,0)

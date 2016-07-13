@@ -3,12 +3,13 @@
 # Writer : lgy
 # dateTime : 2016-06-14
 
-import MySQLdb
 import sys
-sys.path.append("/home/spark/anqu/python/code/Tools")
+sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding("utf8") 
 import chinese
+import MySQLdb
 
 class mysql_op():
 	def __init__(self,host = 'localhost',user='root',passwd = 'root',database='mysql'):

@@ -4,13 +4,10 @@
 # dateTime : 2016-07-07
 
 import sys
-sys.path.append("/home/spark1/python/")
 sys.path.append("/home/spark/anqu/python/code")
 sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/data_deal")
-sys.path.append("/home/spark/anqu/python/code/Cluster")
-sys.path.append("/home/spark/anqu/python/code/Word")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 
 from mysql_op import mysql_op

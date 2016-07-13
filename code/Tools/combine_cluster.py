@@ -2,9 +2,11 @@
 # _*_ coding:utf-8 _*_
 # Writer : lgy
 # dateTime : 2016-07-01
+
 import sys
-sys.path.append("/home/spark/anqu/python/code/Cluster")
+sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf-8')
 
 import cluster_k_means
@@ -76,13 +78,13 @@ class combine_cluster():
 
 def main():
 	Combine_Cluster = combine_cluster()
-	SelectWord = selectWord.selectWord()
-	cluster_resault = SelectWord.readObj("cluster_resault.txt")
+	# SelectWord = selectWord.selectWord()
+	# cluster_resault = SelectWord.readObj("cluster_resault.txt")
 	
-	sort_list = Combine_Cluster.sort(cluster_resault)
-	com_resault = Combine_Cluster.combine_cluster(sort_list,5)
-	SelectWord.getBetterPriorityWord(com_resault,20)
-	SelectWord.getBetterClassWord(com_resault,20)
+	# sort_list = Combine_Cluster.sort(cluster_resault)
+	# com_resault = Combine_Cluster.combine_cluster(sort_list,5)
+	# SelectWord.getBetterPriorityWord(com_resault,20)
+	# SelectWord.getBetterClassWord(com_resault,20)
 	
 
 if __name__ == '__main__':

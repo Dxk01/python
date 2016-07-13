@@ -13,7 +13,7 @@ sys.setdefaultencoding('utf8')
 import time
 import mysql_op
 
-class selectWord():
+class SelectWord():
 	def __init__(self):
 		self.mysql = mysql_op.mysql_op()
 
@@ -187,7 +187,7 @@ class selectWord():
 		self.write(fp,[self.selectBigSearchCountSmallPriority()])
 
 def main():
-	SelectWord = selectWord()
+	selectWord = SelectWord()
 	# word_list = SelectWord.selectMinPriorityofCluster()
 	# word_list = SelectWord.selectMaxPriorityofCluster()
 	# word_list = SelectWord.selectMaxSearchCountOfCluster()

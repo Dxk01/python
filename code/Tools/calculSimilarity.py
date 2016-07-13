@@ -4,12 +4,10 @@
 # dateTime : 2016-06-23
 
 import sys
-sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/python/code/data_deal")
-sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/wordAnalysis")
-sys.path.append("/home/spark/anqu/python/code/Cluster")
+# sys.path.append("/home/spark/anqu/python/code/Cluster")
+sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 
 import myself_cluster as ms
@@ -122,9 +120,9 @@ class similarity():
 
 def main():
 	sim = similarity()
-	print "start ......"
-	sim.run()
-	print 'finished!'
+	# print "start ......"
+	# sim.run()
+	# print 'finished!'
 
 
 if __name__ == '__main__':

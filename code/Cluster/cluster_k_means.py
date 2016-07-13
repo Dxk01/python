@@ -4,11 +4,9 @@
 # dateTime : 2016-06-15
 
 import sys
-sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/python/code/data_deal")
-sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/wordAnalysis")
+sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -150,8 +148,8 @@ class Cluster_K_Means():
 
 def main():
 	clusterk_means = Cluster_K_Means()
-	Matrix,Iddic = clusterk_means.getData()
-	print len(Matrix)
+	# Matrix,Iddic = clusterk_means.getData()
+	# print len(Matrix)
 	# # k-means method
 	# resualt = clusterk_means.cluster_k_means(Matrix)
 	# word_cluster_resault = clusterk_means.mapResault(resualt,Iddic)

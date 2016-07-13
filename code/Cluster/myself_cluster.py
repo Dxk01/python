@@ -4,9 +4,9 @@
 # dateTime : 2016-06-20
 
 import sys
-sys.path.append("/home/spark1/python/")
 sys.path.append("/home/spark/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 import numpy as np
 import data_deal

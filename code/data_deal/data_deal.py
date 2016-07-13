@@ -4,10 +4,10 @@
 # dateTime : 2016-06-15
 
 import sys
-sys.path.append("/home/spark1/python/")
 sys.path.append("/home/spark/anqu/python/code")
-sys.path.append("/home/spark/anqu/python/code/Tools")
 reload(sys)
+import config
+import MySQLdb
 sys.setdefaultencoding('utf8') 
 
 import mysql_op
@@ -21,14 +21,14 @@ import MySQLdb
 class data_deal():
 	#初始化
 	def __init__(self):
-		self.mysql = mysql_op.mysql_op("127.0.0.1","root","root","mysql")
+		self.mysql = mysql_op.mysql_op(config.Host_IP,config.dataBase_user,config.dataBase_passwd,config.database)
+	
 	# 获取App store 的类别ID
 	def getCategory(self):
 		return sorted(list(set(self.mysql.select('select genreID from _category'))))
+	
 	#获取searchApp 表的word
 	def getsearchword(self,sql="select word from ansearchApp where type=1 and genre like \'%6014%\'"):
-		# return list(self.mysql.select("select word, genre from searchApp"))
-		 # and genre like \'%6014%\'
 		return self.mysql.select(sql)
 
 	#获取词的genre ID
@@ -64,7 +64,6 @@ class data_deal():
 	def tranGenretoGenreIDList(self,genrelist):
 		genreIDlist = []
 		for genre in genrelist :
-			# print genre.split(',')
 			genreIDlist.append(list(set(genre.split(','))))
 
 	#映射类别ID到相应的整数
@@ -84,11 +83,8 @@ class data_deal():
 		genredic = {}
 		length = len(word)
 		leng = len(genre)
-		# print genre
-		# print length,leng
 		for i in xrange(length):
 			if word[i] in wdic:
-				# print 'info'
 				Id = wdic.get(word[i])
 				data = genredic.get(Id)
 				data = data +','+genre[i]  #list(set(data.extend(genre[i])))
@@ -114,12 +110,9 @@ class data_deal():
 		data_thinkWord = []
 		sql = 'select word,priority,searchCount,genre from ansearchApp'
 		words = self.mysql.getWordPriority(sql)
-		# print words
 		for word in words:
 			if word[0] in thinkWord:
 				data_thinkWord.append(word)
-			# if len(words) == len(thinkWord):
-				# break
 		return data_thinkWord
 
 	def mapwordAgenreOnAll(self,word_list):
@@ -127,11 +120,8 @@ class data_deal():
 		count = 0
 		genredic = {}
 		length = len(word)
-		# leng = len(genre)
-		# print length,leng
 		for i in xrange(length):
 			if word[i] in wdic:
-				# print 'info'
 				Id = wdic.get(word[i])
 				data = genredic.get(Id)
 				data = data +','+genre[i]  #list(set(data.extend(genre[i])))
@@ -176,25 +166,16 @@ class data_deal():
 
 	#
 	def getMatrix(self):
-		# data_d = data_deal()
 		gdata = self.getCategory() 
 		ddic = self.mapgenreID(gdata)
-		# print ddic
 		s_time = time.time()
 		data1 = self.getsearchword()
-		# print data1
 		e_time = time.time()
-		# print e_time - s_time
 		s_time = time.time()
 		data2 =  self.getsearchgenre()	
 		e_time = time.time()
-		# print e_time - s_time
 		wdic,gdic = self.mapwordAgenre(data1,data2)
-		# print len(wdic),len(gdic)
-		# print wdic
 		Matrix = self.buildMatrix(wdic,gdic,ddic)
-		# daDic = self.mapData(Matrix)
-		# return daDic
 		return Matrix,wdic
 
 	#获取数据记录根据竞品ID
@@ -208,10 +189,9 @@ class data_deal():
 		chin = chinese()
 		word_re = []
 		num = mysqlcur.fetchall()[0][0]
-		# print num
 		blockSize = 10000
 		div = num / 10000 + 1
-		# print div
+
 		for i in xrange(div):
 			msql = 'select word,searchApp from searchApp limit %d , 10000'%(i*10000)
 			# print msql
@@ -222,18 +202,14 @@ class data_deal():
 					appId = word[1].split(',')
 					for  ids in IDs:
 						if ids in appId:
-							# print word[0]
 							word_re.append(word[0])
 							break
 			print 'read ',i,'times'
-			# print len(word_re)
-		# print len(word_re)
 		return  word_re
 
 	#词的去重
 	def delRepeatWord(self,word_list):
 		word_dic = {}
-		# word_re = []
 		chi = chinese()
 		for word in word_list:
 			if word[0] in word_dic:
@@ -267,7 +243,6 @@ class data_deal():
 
 	#计算分析矩阵,和
 	def calMatrix(self,data):
-		# print data[0]
 		gdata = self.getCategory() 
 		ddic = self.mapgenreID(gdata)
 		wdic,gdic = self.mapwordAgenre(data[0],data[3])
@@ -283,9 +258,7 @@ class data_deal():
 	#映射字典构建矩阵
 	def mapwordAgenerDic(self,words,ddic):
 		Matrix = np.zeros((len(words),len(ddic)))
-		# print len(ddic)
 		for i in xrange(len(words)):
-			# print words[i]#words[i][3]
 			glist = words[i][3].split(',')
 			for p_l in glist:
 				p = ddic[long(p_l)]
