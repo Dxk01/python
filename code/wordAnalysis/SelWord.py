@@ -4,10 +4,10 @@
 # dateTime : 2016-06-24
 
 import sys
-sys.path.append("/home/spark/anqu/python/code/data_deal")
-sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/wordAnalysis")
+sys.path.append("/home/mysql1/anqu/python/code")
+# sys.path.append("/home/mysql1/anqu/python/code/Tools")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 
 import time

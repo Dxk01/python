@@ -4,8 +4,8 @@
 # dateTime : 2016-07-07
 
 import sys
-sys.path.append("/home/spark/anqu/python/code")
-sys.path.append("/home/spark/anqu/python/code/Tools")
+sys.path.append("/home/mysql1/anqu/python/code")
+# sys.path.append("/home/mysql1/anqu/python/code/Tools")
 reload(sys)
 import config
 sys.setdefaultencoding('utf8') 

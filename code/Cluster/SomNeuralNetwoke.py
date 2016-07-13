@@ -5,7 +5,7 @@
 # 功能 ：SOM自适应神经网络聚类算法实现，低效率是主要问题
 
 import sys
-sys.path.append("/home/spark/anqu/python/code")
+sys.path.append("/home/mysql1/anqu/python/code")
 reload(sys)
 import config
 sys.setdefaultencoding('utf8') 

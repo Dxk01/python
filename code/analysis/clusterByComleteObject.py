@@ -4,12 +4,11 @@
 # dateTime : 2016-07-01
 
 import sys
-sys.path.append("/home/spark/anqu/python/code/Cluster")
-sys.path.append("/home/spark/anqu/python/code/data_deal")
-sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/Word")
+sys.path.append("/home/mysql1/anqu/python/code")
+# sys.path.append("/home/mysql1/anqu/python/code/Tools")
 reload(sys)
-sys.setdefaultencoding('utf-8')
+import config
+sys.setdefaultencoding('utf8')
 
 from cluster_k_means import Cluster_K_Means
 import selectWord
@@ -123,11 +122,11 @@ class clusterByCompleteObject():
 
 def main():
 	k = 8
-	combine_num = 8
-	topWord = 100
-	cluster = clusterByCompleteObject(k)
-	complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
-	print complete_Ids
+	# combine_num = 8
+	# topWord = 100
+	# cluster = clusterByCompleteObject(k)
+	# complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
+	# print complete_Ids
 	# print complete_Ids
 	# select = selectWord()
 	# # complete_Ids = ('443354861','799406905','457517348','453640300','615187629','471802217','521922264','389801252','847334708','592331499','606080169','611129419','825355393','608188610','933456837','599534650')

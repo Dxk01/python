@@ -4,13 +4,9 @@
 # dateTime : 2016-07-08
 
 import sys
-sys.path.append("/home/spark1/python/")
-sys.path.append("/home/spark/anqu/python/code")
-sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/data_deal")
-sys.path.append("/home/spark/anqu/python/code/Cluster")
-sys.path.append("/home/spark/anqu/python/code/Word")
+sys.path.append("/home/mysql1/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf8') 
 
 from mysql_op import mysql_op
@@ -53,11 +49,11 @@ class ClassWordExtend():
 
 def main():
 	cwd = ClassWordExtend()
-	genreIds = cwd.getGenreIDByAppId([284087761,284124560,284146702])
-	print genreIds
-	word_re = cwd.getKeyWordofClassWord(genreIds)
+	# genreIds = cwd.getGenreIDByAppId([284087761,284124560,284146702])
+	# print genreIds
+	# word_re = cwd.getKeyWordofClassWord(genreIds)
 	# for word in word_re:
 		# print word
-	print len(word_re)
+	# print len(word_re)
 if __name__ == '__main__':
 	main()

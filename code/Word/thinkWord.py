@@ -5,9 +5,9 @@
 # 关键词的联想词的分析获取
 
 import sys
-sys.path.append("/home/spark/anqu/python/code/Tools")
-sys.path.append("/home/spark/anqu/python/code/data_deal")
+sys.path.append("/home/mysql1/anqu/python/code")
 reload(sys)
+import config
 sys.setdefaultencoding('utf-8')
 
 from mysql_op import mysql_op
@@ -57,8 +57,8 @@ class thinkWord():
 def main():
 	tWord = thinkWord()
 	# re = tWord.getThinkWord('微信')
-	re = tWord.getThinkWordCluster(['微信',])
-	print re[0]
+	# re = tWord.getThinkWordCluster(['微信',])
+	# print re[0]
 
 if __name__ == '__main__':
 	main()

@@ -4,7 +4,7 @@
 # dateTime : 2016-06-14
 
 import sys
-sys.path.append("/home/spark/anqu/python/code")
+sys.path.append("/home/mysql1/anqu/python/code")
 reload(sys)
 import config
 sys.setdefaultencoding("utf8") 
@@ -12,7 +12,7 @@ import chinese
 import MySQLdb
 
 class mysql_op():
-	def __init__(self,host = 'localhost',user='root',passwd = 'root',database='mysql'):
+	def __init__(self,host = config.Host_IP,user=config.dataBase_user,passwd = config.dataBase_passwd,database=config.dataBase):
 		try :
 			self.conn = MySQLdb.connect(host = host,user=user,passwd=passwd,db = database,port=3306,charset='utf8')
 			self.cur =  self.conn.cursor()

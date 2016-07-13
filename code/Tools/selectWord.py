@@ -4,7 +4,7 @@
 # dateTime : 2016-06-23
 
 import sys
-sys.path.append("/home/spark/anqu/python/code")
+sys.path.append("/home/mysql1/anqu/python/code")
 reload(sys)
 import config
 sys.setdefaultencoding('utf8') 
@@ -116,4 +116,111 @@ class selectWord():
 	#获得当前品类词前Top K的维度词结果
 	def getTopKClassWord(self,topWord=20,top_K=4):
 		mysql = mysql_op.mysql_op()
-		top_kClusters = mysql.select("
+		top_kClusters = mysql.select("select cluster from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
+		Datas = []
+		for cluster in top_kClusters:
+			data = mysql.getWordPriority('select * from wordSelectFeature where cluster =%d and searchCount > 4500 order by priority desc limit %d'%(cluster,topWord*2))
+			for word in data:
+				if len(word[0]) <= 1 or len(word[0]) > 10:
+					data.remove(word)
+			Datas.append(data[0:topWord])
+		self.write_to_local(Datas,topWord,'ClassWord',2)
+		return Datas   #k组词，每组词包含与其相关的信息
+
+	#获取品类词的联想词
+	def getTopKKeyWordNotLong(self,Datas):
+		re_datas = []
+		for data in Datas:
+			datas = []
+			for word in data:
+				if len(word[0]) < 10 and  len(word[0]) > 1:
+					datas.append(word)
+			re_datas.append(datas)
+		return re_datas
+
+	#计算品类词的关联特性下，更新各关键词的权重
+	def getTopKKeyWordcontainClassWord(self,Datas,classWords,topWord=20):
+		re_Data = []
+		for i in xrange(len(Datas)):
+			re_data = []
+			for word in Datas[i]:
+				word_v = word[1]
+				for cWord in classWords[i]:
+					if cWord[0] in word[0] and len(cWord[0]) > 1: #or word[0] in cWord[0]:
+						# print word[0],cWord[0]
+						word_v = word_v + 200
+				re_data.append([word[0],word_v,word[2],word[3],word[4]])
+			sorted(re_data, key = lambda asd:asd[1],reverse=True)
+			re_Data.append(re_data[0:topWord])
+		return re_Data
+
+	#获取当前关键字前Top K聚类中的维度词的结果
+	def getTopKKeyWord(self,topWord=20,top_K=4):
+		classWords = self.getTopKClassWord(topWord,top_K)
+		mysql = mysql_op.mysql_op()
+		top_kClusters = mysql.select("select cluster from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
+		Datas = []
+		for cluster in top_kClusters:
+			sql = 'select * from wordSelectFeature where cluster =%d and searchCount < 1500 and priority < 6000 order by priority desc'%cluster
+			data = mysql.getWordPriority(sql)
+			Datas.append(data)
+		Datas = self.getTopKKeyWordNotLong(Datas)
+		Datas = self.getTopKKeyWordcontainClassWord(Datas,classWords,topWord*2)
+		# for words in Datas:
+		# 	for word in words:
+		# 		print word[0]
+		self.write_to_local(Datas,topWord*2,'keyword',1)
+		return Datas
+
+	#将推荐的结果写入到文件
+	def write_to_local(self,Datas,topWord = 20,filename='keyword',type=1):
+		# filepath = "/home/spark/anqu/analysisResault/"
+		ISOTIMEFORMAT='%Y-%m-%d %X'
+		dateTime =  time.strftime( ISOTIMEFORMAT, time.localtime())
+		filepath = '/home/spark/anqu/analysisResault/'
+		filename = filepath+filename+"/"+filename+dateTime+".txt"
+		fp = open(filename,'a')
+		count = 1
+		if type == 1:
+			fp.write("关键字的推荐词：\n")
+		else :
+			fp.write("品类词的推荐词：\n")
+		for KeyWords in Datas:
+			if KeyWords == None or len(KeyWords) == 0:
+				continue
+			fp.write("第  %d  维度       Top  %d 关键词        Cluster : %d\n"%(count,topWord,KeyWords[0][4]))
+			for word in KeyWords:
+				if type == 2:
+					fp.write(word[0] + " ")  #+str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n"
+				else :
+					fp.write(word[0] + ',')
+			count += 1
+			fp.write("\n\n\n")
+		fp.close()
+
+	#数据对象写入文件存储
+	def writeObj(self,obj,file):
+		filepath = '/home/spark/anqu/analysisResault/Object/'
+		f = open(filepath+file, 'wb')
+		pickle.dump(obj, f)
+		f.close()
+
+	#读取文件中的数据对象
+	def readObj(self,file):
+		filepath = '/home/spark/anqu/analysisResault/Object/'
+		f = open(filepath+file,'rb')
+		return pickle.load(f)
+
+def main():
+	select = selectWord()
+	# SelectWord.getTopKClassWord()
+
+	# SelectWord.selectWord()
+	# SelectWord.insert_analysis_data()
+	# select.getTopKClassWord(30,20)
+
+	select.getTopKKeyWord(50,20)
+
+
+if __name__ == '__main__':
+	main()
