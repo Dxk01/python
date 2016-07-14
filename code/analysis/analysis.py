@@ -41,7 +41,7 @@ def runAnalysis_ch(Input_Ids,genreIDs,Cluster_K = 20,div = 20,TopKDiv = 50):
 	# print len(complete_Ids)
 	#real
 	keyWords = data.getDataByID_ch(complete_Ids)
-	keyWords = data.delRepeatWord(keyWords)
+	keyWords = data.delRepeatWord_ch(keyWords)
 	select.writeObj(keyWords,"com_keyWords.txt")
 
 	#for test 
@@ -179,6 +179,10 @@ def main():
 	TopKDiv = 50
 	if config.dataBase == config.database_en:
 		runAnalysis_en(Input_Ids,genreIDs,Cluster_K,div,TopKDiv)
+	elif config.dataBase == config.database_ch:
+		runAnalysis_ch(Input_Ids,genreIDs,Cluster_K,div,TopKDiv)
+	elif config.dataBase == config.database_japan:
+		pass
 
 
 
