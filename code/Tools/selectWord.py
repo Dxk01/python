@@ -120,9 +120,9 @@ class selectWord():
 		Datas = []
 		for cluster in top_kClusters:
 			data = mysql.getWordPriority('select * from wordSelectFeature where cluster =%d and searchCount > 4500 order by priority desc limit %d'%(cluster,topWord*2))
-			for word in data:
-				if len(word[0]) <= 1 or len(word[0]) > 10:
-					data.remove(word)
+			# for word in data:
+			# 	if len(word[0]) <= 1 or len(word[0]) > 10:
+			# 		data.remove(word)
 			Datas.append(data[0:topWord])
 		self.write_to_local(Datas,topWord,'ClassWord',2)
 		return Datas   #k组词，每组词包含与其相关的信息
@@ -132,10 +132,10 @@ class selectWord():
 		re_datas = []
 		for data in Datas:
 			datas = []
-			for word in data:
-				if len(word[0]) < 10 and  len(word[0]) > 1:
-					datas.append(word)
-			re_datas.append(datas)
+			# for word in data:
+			# 	if len(word[0]) < 10 and  len(word[0]) > 1:
+			# 		datas.append(word)
+			re_datas.append(data)
 		return re_datas
 
 	#计算品类词的关联特性下，更新各关键词的权重
@@ -177,8 +177,12 @@ class selectWord():
 		# filepath = "/home/spark/anqu/analysisResault/"
 		ISOTIMEFORMAT='%Y-%m-%d %X'
 		dateTime =  time.strftime( ISOTIMEFORMAT, time.localtime())
-		filepath = '/home/spark/anqu/analysisResault/'
-		filename = filepath+filename+"/"+filename+dateTime+".txt"
+		filepath = config.fileResaultPath
+		if type != 1:
+			filepath = config.fileClassResaultPath
+		else:
+			filepath = config.fileKeyWordResaultPath
+		filename = filepath+"/"+filename+dateTime+".txt"
 		fp = open(filename,'a')
 		count = 1
 		if type == 1:
@@ -190,24 +194,21 @@ class selectWord():
 				continue
 			fp.write("第  %d  维度       Top  %d 关键词        Cluster : %d\n"%(count,topWord,KeyWords[0][4]))
 			for word in KeyWords:
-				if type == 2:
-					fp.write(word[0] + " ")  #+str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n"
-				else :
-					fp.write(word[0] + ',')
+					fp.write(word[0] + " | ")  #+str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n"
 			count += 1
 			fp.write("\n\n\n")
 		fp.close()
 
 	#数据对象写入文件存储
 	def writeObj(self,obj,file):
-		filepath = '/home/spark/anqu/analysisResault/Object/'
+		filepath = config.fileObjectPath+'/'
 		f = open(filepath+file, 'wb')
 		pickle.dump(obj, f)
 		f.close()
 
 	#读取文件中的数据对象
 	def readObj(self,file):
-		filepath = '/home/spark/anqu/analysisResault/Object/'
+		filepath = config.fileObjectPath+'/'
 		f = open(filepath+file,'rb')
 		return pickle.load(f)
 

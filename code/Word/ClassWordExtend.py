@@ -31,8 +31,8 @@ class ClassWordExtend():
 					genreIds.extend(data[0].split(","))
 		return list(set(genreIds))
 
-	#获取类别的下的关键词
-	def getKeyWordofClassWord(self,genreIds):
+	#获取类别的下的关键词  chinese
+	def getKeyWordofClassWord_ch(self,genreIds):
 		sql = 'select word,genre from ansearchApp'
 		mysql = mysql_op()
 		words = mysql.getWordPriority(sql)
@@ -46,6 +46,24 @@ class ClassWordExtend():
 						word_re.append(word[0])
 					break
 		return list(set(word_re))
+
+	#获取类别的下的关键词  english
+	def getKeyWordofClassWord_en(self,genreIds):
+		sql = 'select word,genre from ansearchApp'
+		mysql = mysql_op()
+		words = mysql.getWordPriority(sql)
+		# print words[0]
+		word_re = []
+		chi = chinese()
+		for word in words:
+			for genreId in genreIds:
+				if genreId in word[1].split(','):
+					if chi.is_english(word[0]):
+						word_re.append(word[0])
+					break
+		return list(set(word_re))
+
+	
 
 def main():
 	cwd = ClassWordExtend()

@@ -70,7 +70,7 @@ class clusterByCompleteObject():
 	def getCompleteProductId(self,complete_Ids,top_k = 15):
 		mysql = mysql_op()
 		completeId_list = []
-		sql = 'select topApp from topApp'
+		sql = 'select topApp from topapp'
 		topAppIds = mysql.select(sql)
 		for complete_id in  complete_Ids:
 			for appIds in topAppIds:
@@ -124,8 +124,9 @@ def main():
 	k = 8
 	# combine_num = 8
 	# topWord = 100
-	# cluster = clusterByCompleteObject(k)
-	# complete_Ids = cluster.getCompleteProductId(['994120614','1111594089','962734163'])
+	cluster = clusterByCompleteObject(k)
+	complete_Ids = cluster.getCompleteProductId(['620112416',])
+	print len(complete_Ids)
 	# print complete_Ids
 	# print complete_Ids
 	# select = selectWord()

@@ -23,14 +23,20 @@ class chinese():
     			# print u'没有包含中文'
     			return False
 
+	def is_english(self,words):
+		for word in words.split(' '):
+			if word.isalpha() == False:
+				return False
+		return True    			
+
     	#是否包含单引号
-    	def is_contains(self,c_str):
-    		an = re.compile(u'\'')
-    		match = an.search(c_str)
-    		if match:
-    			return True
-    		else:
-    			return False
+	def is_contains(self,c_str):
+		an = re.compile(u'\'')
+		match = an.search(c_str)
+		if match:
+			return True
+		else:
+			return False
 
 def main():
 	chin = chinese()

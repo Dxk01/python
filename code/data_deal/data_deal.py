@@ -21,7 +21,7 @@ import MySQLdb
 class data_deal():
 	#初始化
 	def __init__(self):
-		self.mysql = mysql_op.mysql_op(config.Host_IP,config.dataBase_user,config.dataBase_passwd,config.database)
+		self.mysql = mysql_op.mysql_op(config.Host_IP,config.dataBase_user,config.dataBase_passwd,config.dataBase)
 	
 	# 获取App store 的类别ID
 	def getCategory(self):
@@ -108,7 +108,7 @@ class data_deal():
 	#获取联想词的词热和searchCount,genre等信息
 	def getThinkWordPriorityAndSearchC(self,thinkWord):
 		data_thinkWord = []
-		sql = 'select word,priority,searchCount,genre from ansearchApp'
+		sql = 'select distinct(word),priority,searchCount,genre from ansearchApp'
 		words = self.mysql.getWordPriority(sql)
 		for word in words:
 			if word[0] in thinkWord:
@@ -178,12 +178,12 @@ class data_deal():
 		Matrix = self.buildMatrix(wdic,gdic,ddic)
 		return Matrix,wdic
 
-	#获取数据记录根据竞品ID
-	def getDataByID(self,IDs):
+	#获取数据记录根据竞品ID   chinese
+	def getDataByID_ch(self,IDs):
 		if IDs == None or len(IDs) == 0:
 			return []
 		sql = "select count(word) from searchApp"
-		mysqlconn = MySQLdb.connect(host = 'localhost',user='root',passwd='root',db = 'mysql',port=3306,charset='utf8')
+		mysqlconn = MySQLdb.connect(host = config.Host_IP,user=config.dataBase_user,passwd=config.dataBase_passwd,db = config.dataBase,port=config.dataBase_port,charset='utf8')
 		mysqlcur = mysqlconn.cursor()
 		re = mysqlcur.execute(sql)
 		chin = chinese()
@@ -207,8 +207,37 @@ class data_deal():
 			print 'read ',i,'times'
 		return  word_re
 
-	#词的去重
-	def delRepeatWord(self,word_list):
+	#获取数据记录根据竞品ID   english
+	def getDataByID_en(self,IDs):
+		if IDs == None or len(IDs) == 0:
+			return []
+		sql = "select count(word) from searchApp"
+		mysqlconn = MySQLdb.connect(host = config.Host_IP,user=config.dataBase_user,passwd=config.dataBase_passwd,db = config.dataBase,port=config.dataBase_port,charset='utf8')
+		mysqlcur = mysqlconn.cursor()
+		re = mysqlcur.execute(sql)
+		chin = chinese()
+		word_re = []
+		num = mysqlcur.fetchall()[0][0]
+		blockSize = 10000
+		div = num / 10000 + 1
+
+		for i in xrange(div):
+			msql = 'select word,searchApp from searchApp limit %d , 10000'%(i*10000)
+			# print msql
+			re = mysqlcur.execute(msql)
+			words = mysqlcur.fetchall()
+			for word in words:
+				if chin.is_english(word[0]):
+					appId = word[1].split(',')
+					for  ids in IDs:
+						if ids in appId:
+							word_re.append(word[0])
+							break
+			print 'read ',i,'times'
+		return  word_re
+
+	#词的去重  chinese
+	def delRepeatWord_ch(self,word_list):
 		word_dic = {}
 		chi = chinese()
 		for word in word_list:
@@ -217,6 +246,21 @@ class data_deal():
 				continue
 			else:
 				if chi.is_chinese(word[0]):
+					word_dic.setdefault(word[0])
+				else:
+					word_list.remove(word)
+		return list(set(word_list))
+
+	#词的去重  chinese
+	def delRepeatWord_en(self,word_list):
+		word_dic = {}
+		chi = chinese()
+		for word in word_list:
+			if word[0] in word_dic:
+				word_list.remove(word)
+				continue
+			else:
+				if chi.is_english(word[0]):
 					word_dic.setdefault(word[0])
 				else:
 					word_list.remove(word)

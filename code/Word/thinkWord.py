@@ -31,15 +31,27 @@ class thinkWord():
 		resault = mysql.select(sql)
 		return resault
 
-	#当前聚类下的联想词的获得
-	def getThinkWordCluster(self,cluster_Words):
+	#当前聚类下的联想词的获得 chinese 
+	def getThinkWordCluster_ch(self,cluster_Words):
 		thinkWords = []
 		mysql = mysql_op()
-		sql = 'select word,hintword from hintWord'
+		sql = 'select word,hintword from %s'%config.hintWord
 		All_thinkwords = mysql.getWordPriority(sql)
 		chi = chinese()
 		for word in All_thinkwords:
 			if word[1] in cluster_Words and chi.is_chinese(word[0]):
+				thinkWords.append(word[0])
+		return thinkWords
+
+	#当前聚类下的联想词的获得 english
+	def getThinkWordCluster_en(self,cluster_Words):
+		thinkWords = []
+		mysql = mysql_op()
+		sql = 'select word,hintword from %s'%config.hintWord
+		All_thinkwords = mysql.getWordPriority(sql)
+		chi = chinese()
+		for word in All_thinkwords:
+			if word[1] in cluster_Words and chi.is_english(word[0]):
 				thinkWords.append(word[0])
 		return thinkWords
 	#获取联想词的词热等信息数据

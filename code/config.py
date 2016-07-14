@@ -17,6 +17,11 @@ dataBase_port = 3306    #config to your database port
 dataBase_user = 'root'  #config to your database user
 dataBase_passwd = 'root'#config to your database user's password
 
+#xiang guan de biao 
+# hintWord = 'hintword'   
+hintWord = 'searchHint'
+
+
 #系统运行各模块包路径
 
 fileResaultPath = '/home/mysql1/anqu/analysisResault/'  #config the path what you want
