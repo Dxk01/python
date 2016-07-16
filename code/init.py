@@ -18,11 +18,13 @@ def init_mysql():
 	mysql = mysql_op()
 	# create table ansearchApp
 	# create table ansearchApp(word varchar(255),priority int,searchCount int ,genre varchar(255),type int,time int);
-	sql = 'create table if not exists ansearchApp(word varchar(255),priority int,searchCount int ,genre varchar(255),type int,time int)'
+	sql = 'create table if not exists ansearchApp(word varchar(255) CHARACTER SET utf8mb4,priority int,searchCount int ,genre varchar(255),type int,time int)'
 	mysql.excute(sql)
 	# create table 
 	#create table wordSelectFeature (word varchar(255),priority int,searchCount int,relevancy float,cluster int);
-	sql = 'create table if not exists wordSelectFeature (word varchar(255),priority int,searchCount int,relevancy float,cluster int)'
+	sql = 'create table if not exists wordSelectFeature (word varchar(255) CHARACTER SET utf8mb4,priority int,searchCount int,relevancy float,cluster int)'
+	mysql.excute(sql)
+	sql = 'create index searchAppWordIndex on searchApp(word)'
 	mysql.excute(sql)
 
 """fileClassResaultPath = fileResaultPath + 'ClassResault'

@@ -12,7 +12,7 @@ database_chi = 'mysql_anqu_chi' #chinese
 database_japan = 'mysql_anqu_japan' #japanese
 # add your database depend on your need
 # database_XXX  
-dataBase = database_en
+dataBase = database_chi
 dataBase_port = 3306    #config to your database port 
 dataBase_user = 'root'  #config to your database user
 dataBase_passwd = 'root'#config to your database user's password
@@ -25,8 +25,8 @@ hintWord = 'searchHint'
 #系统运行各模块包路径
 
 fileResaultPath = '/home/mysql1/anqu/analysisResault/'  #config the path what you want
-fileClassResaultPath = fileResaultPath + 'ClassResault'
-fileKeyWordResaultPath = fileResaultPath + 'KeyWordResault'
+fileClassResaultPath = fileResaultPath + 'ClassWord'
+fileKeyWordResaultPath = fileResaultPath + 'KeyWord'
 fileObjectPath = fileResaultPath + "Object"
 fileRootPath = '/home/mysql1/anqu/python/code/'        #config the path being the point your code was contained ! 
 fileToolsPath = fileRootPath + "Tools"

@@ -169,32 +169,40 @@ class selectWord():
 		# for words in Datas:
 		# 	for word in words:
 		# 		print word[0]
-		self.write_to_local(Datas,topWord*2,'keyword',1)
+		self.write_to_local(Datas,topWord*2,'KeyWord',1)
+		return Datas
+
+	#top K  title
+	def getTopKTitleWord(self,topWord=20,top_K=4):
+		mysql = mysql_op.mysql_op()
+		Datas = []
+		sql = 'select * from ansearchApp where priority > 7000 order by priority desc'
+		data = mysql.getWordPriority(sql)
+		Datas.append(data)
+		self.write_to_local(Datas,topWord*2,'TopTitle',3)
 		return Datas
 
 	#将推荐的结果写入到文件
-	def write_to_local(self,Datas,topWord = 20,filename='keyword',type=1):
+	def write_to_local(self,Datas,topWord = 20,filename='KeyWord',type=1):
 		# filepath = "/home/spark/anqu/analysisResault/"
 		ISOTIMEFORMAT='%Y-%m-%d %X'
 		dateTime =  time.strftime( ISOTIMEFORMAT, time.localtime())
 		filepath = config.fileResaultPath
-		if type != 1:
-			filepath = config.fileClassResaultPath
-		else:
-			filepath = config.fileKeyWordResaultPath
-		filename = filepath+"/"+filename+dateTime+".txt"
+		filename = filepath+filename+"/"+filename+dateTime+".txt"
 		fp = open(filename,'a')
 		count = 1
 		if type == 1:
 			fp.write("关键字的推荐词：\n")
-		else :
+		elif type == 2:
 			fp.write("品类词的推荐词：\n")
+		else :
+			fp.write("title :\n")
 		for KeyWords in Datas:
 			if KeyWords == None or len(KeyWords) == 0:
 				continue
 			fp.write("第  %d  维度       Top  %d 关键词        Cluster : %d\n"%(count,topWord,KeyWords[0][4]))
 			for word in KeyWords:
-					fp.write(word[0] + " | ")  #+str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n"
+					fp.write(word[0] + ':'+str(word[1])+" | ")  #+str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n"
 			count += 1
 			fp.write("\n\n\n")
 		fp.close()
@@ -221,6 +229,7 @@ def main():
 	# select.getTopKClassWord(30,20)
 
 	select.getTopKKeyWord(50,20)
+	select.getTopKTitleWord(50,20)
 
 
 if __name__ == '__main__':

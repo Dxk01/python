@@ -182,36 +182,45 @@ class data_deal():
 	def getDataByID_ch(self,IDs):
 		if IDs == None or len(IDs) == 0:
 			return []
-		sql = "select count(word) from searchApp"
+		sql = "select count(word) from searchApp collect order by word"
 		mysqlconn = MySQLdb.connect(host = config.Host_IP,user=config.dataBase_user,passwd=config.dataBase_passwd,db = config.dataBase,port=config.dataBase_port,charset='utf8')
 		mysqlcur = mysqlconn.cursor()
 		re = mysqlcur.execute(sql)
 		chin = chinese()
 		word_re = []
 		num = mysqlcur.fetchall()[0][0]
-		blockSize = 10000
-		div = num / 10000 + 1
-
+		blockSize = 20000
+		div = num / blockSize + 1
+		
 		for i in xrange(div):
-			msql = 'select word,searchApp from searchApp limit %d , 10000'%(i*10000)
-			# print msql
-			re = mysqlcur.execute(msql)
+			sql_st = time.time()
+			msql = 'select word,searchApp from searchApp collect order by word limit %d , %d'%((i)*blockSize,blockSize)
+			sql_ent = time.time()
+			print 'sql spend time:',sql_ent - sql_st
+			# build dic 
+			match_st = time.time()
+			res = mysqlcur.execute(msql)
 			words = mysqlcur.fetchall()
 			for word in words:
 				if chin.is_chinese(word[0]):
-					appId = word[1].split(',')
-					for  ids in IDs:
-						if ids in appId:
+					# appId = word[1].split(',')
+					# if bool(set(IDs)&set(appId)):
+					for ids in IDs:
+						if word[1].find(ids):
 							word_re.append(word[0])
 							break
+			match_ent = time.time()
+			print 'find spend time:',match_ent - match_st
 			print 'read ',i,'times'
+			# if i >= 2:
+			break	
 		return  word_re
 
 	#获取数据记录根据竞品ID   english
 	def getDataByID_en(self,IDs):
 		if IDs == None or len(IDs) == 0:
 			return []
-		sql = "select count(word) from searchApp"
+		sql = "select count(word) from searchApp collect order by word"
 		mysqlconn = MySQLdb.connect(host = config.Host_IP,user=config.dataBase_user,passwd=config.dataBase_passwd,db = config.dataBase,port=config.dataBase_port,charset='utf8')
 		mysqlcur = mysqlconn.cursor()
 		re = mysqlcur.execute(sql)
@@ -222,7 +231,7 @@ class data_deal():
 		div = num / 10000 + 1
 
 		for i in xrange(div):
-			msql = 'select word,searchApp from searchApp limit %d , 10000'%(i*10000)
+			msql = 'select word,searchApp from searchApp collect order by word limit %d , 10000'%(i*10000)
 			# print msql
 			re = mysqlcur.execute(msql)
 			words = mysqlcur.fetchall()
@@ -333,6 +342,10 @@ class data_deal():
 
 def main():
 	data_d = data_deal()
+	da = {'1':1,'2':2,'3':3}
+	if da.has_key('1'):
+		print 1
+
 	# mat = data_d.getMatrix()
 	# print len(mat[0])
 	# word_list = data_d.getDataByID([u'333206289', u'724295527', u'1090254952', u'1080608190', u'955253735', u'394075284', u'1046617847', u'1067721155', u'1061531453', u'996509117', '962734163', u'423084029', u'475966832', u'489782456', u'531761928', u'1014227673', u'407925512', u'438865278', u'1076606734', u'429885089', u'453718989', u'1075872386', u'919854496', u'414478124', u'393765873', u'412395632', u'409563112', u'1071403903', u'395893124', u'444934666', u'989673964', u'991018252', '994120614', u'592331499', u'1099554323', '1111594089', u'932299405', u'1042545880', u'1076471738', u'791532221', u'1027688889'])

@@ -36,7 +36,7 @@ class mysql_op():
 		chin = chinese.chinese()
 		#创建ansearchApp表
 		#create table ansearchApp(word varchar(255),priority int,searchCount int ,genre varchar(255),type int,time int);
-		anS_conn = MySQLdb.connect(host = config.Host_IP,user=config.dataBase_user,passwd=config.dataBase_passwd,db = config.database,port=config.port,charset='utf8')
+		anS_conn = MySQLdb.connect(host = config.Host_IP,user=config.dataBase_user,passwd=config.dataBase_passwd,db = config.dataBase,port=config.dataBase_port,charset='utf8')
 		anS_cur = anS_conn.cursor()
 		# print self.cur.rowcount
 		word = {}
@@ -47,8 +47,6 @@ class mysql_op():
 			word.setdefault(line[0])
 			if chin.is_chinese(line[0]) :
 				data_l.append(line)
-				# if line[0] == '轻':
-					# print 1
 				if chin.is_contains(line[0]):
 					sql = "insert into ansearchApp values(\"%s\",%d,%d,\'%s\',%d,%d)"%line
 				else : 
@@ -56,6 +54,7 @@ class mysql_op():
 				# print sql
 				anS_cur.execute(sql)
 				anS_conn.commit()
+				# break
 
 	#judge word is english
 	def select_E(self):
@@ -152,9 +151,11 @@ def main():
 	# for line in data:
 		# print line[0],line[1],line[2]
 	# 数据去重，过滤速度慢
-	# mysql.selectA()
-	mysql.select_E()
-
+	if config.dataBase == config.database_chi:
+		mysql.selectA()
+	if config.dataBase == config.database_en:
+		mysql.select_E()
+	# print mysql.select('select word from ansearchApp limit 1')[0]
 if __name__ == '__main__':
 	main()
 
