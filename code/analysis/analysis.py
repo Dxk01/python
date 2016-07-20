@@ -42,67 +42,86 @@ def runAnalysis_ch(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 	netLink = NetLink()
 
 	complete_Ids,genreIDs = netLink.getCompleteIds(Input_Ids)
-	print len(complete_Ids)
+	print 'com_Id',len(complete_Ids)
 	# #real
+	# st = time.time()
 	st = time.time()
 	keyWords = data.getDataByID_ch(complete_Ids)
 	keyWords = data.delRepeatWord_ch(keyWords)
-	en_t = time.time()
-	print en_t - st
-	# select.writeObj(keyWords,"com_keyWords.txt")
+	# en_t = time.time()
+	# print en_t - st
+	select.writeObj(keyWords,"com_keyWords.txt")
+	en = time.time()
+	print '1 spend time:',en - st
 
 	# #for test 
-	# # keyWords = select.readObj("com_keyWords.txt")
+	# keyWords = select.readObj("com_keyWords.txt")
 
-	# print len(keyWords)
+	print 'keyword',len(keyWords)
 	# # # #get think words  获取联想词
 	# # # #real
-	# thinkWords = think.getThinkWordCluster_ch(keyWords)
-	# select.writeObj(thinkWords,"thinkWords.txt")
+	st = time.time()
+	thinkWords = think.getThinkWordCluster_ch(keyWords)
+	select.writeObj(thinkWords,"thinkWords.txt")
+	en = time.time()
+	print '2 spend time :',en - st
 
-	# # thinkWords = select.readObj("thinkWords.txt")
+	# thinkWords = select.readObj("thinkWords.txt")
 
-	# print len(list(set(thinkWords)))
+	thinkWords = list(set(thinkWords))
+	print 'thinkWords',len(thinkWords)
 
+	st = time.time()
 	# # #获取App 的类别下的关联词
-	# cwd_Words = cwd.getKeyWordofClassWord_ch(genreIDs)
-	# select.writeObj(cwd_Words,"cwd_Words.txt")
+	cwd_Words = cwd.getKeyWordofClassWord_ch(genreIDs)
+	cwd_Words = list(set(cwd_Words))
+	select.writeObj(cwd_Words,"cwd_Words.txt")
+	en = time.time()
+	# cwd_Words = select.readObj("cwd_Words.txt")
+	print '3 spend time :',en - st
+	print 'cwd_words',len(cwd_Words)
 
-	# # cwd_Words = select.readObj("cwd_Words.txt")
+	all_Words = list(set(keyWords+thinkWords+cwd_Words))
+	all_Words = data.delRepeatWord_ch(all_Words)
+	select.writeObj(all_Words,"all_Words.txt")
+	# all_Words = select.readObj("all_Words.txt")
+	print 'all',len(all_Words)
 
-	# print len(cwd_Words)
 
-	# all_Words = list(set(keyWords+thinkWords+cwd_Words))
-	# select.writeObj(all_Words,"all_Words.txt")
-
-	# # all_Words = select.readObj("all_Words.txt")
-	# print len(all_Words)
 
 	# # # #for test
 	# # # #获取词的信息(词，词热，searchCount,genre)
-	# WordNews = data.getThinkWordPriorityAndSearchC(all_Words)
-	# WordNews = list(set(WordNews))	
-	# select.writeObj(WordNews,"WordNews.txt")
+	g_st = time.time()
+	WordNews = data.getThinkWordPriorityAndSearchC(all_Words)
+	WordNews = list(set(WordNews))	
+	g_en = time.time()
+	print '4 spent time : ',g_en - g_st
+	select.writeObj(WordNews,"WordNews.txt")
 
 	# WordNews  = select.readObj("WordNews.txt")
-	# print len(WordNews)
+	print len(WordNews)
 
 	# # # #cluster word 
 	# # # # build matrix 
-	# Matrix = data.calMatrixByWordNews(WordNews)
+	st = time.time()
+	Matrix = data.calMatrixByWordNews(WordNews)
 	# # # # cluster
-	# resualt = ckm.cluster_k_means(Matrix,Cluster_K)
+	resualt = ckm.cluster_k_means(Matrix,Cluster_K)
+	en = time.time()
+	print 'cluster spend time :',en - st
 	# # resualt = snn.cluster(Matrix)
 	# # resualt = snn.unLearncluster(Matrix)
 
-	# print len(Matrix),len(resualt)
+	print 'resault',len(Matrix),len(resualt)
 	# # # 写入到数据库
-	# sim = np.zeros(len(resualt))	# all_Words = data.delRepeatWord(all_Words)
-	# select.insert_data(WordNews,sim,resualt)
-
+	st = time.time()
+	sim = np.zeros(len(resualt))	# all_Words = data.delRepeatWord(all_Words)
+	select.insert_data(WordNews,sim,resualt)
+	en = time.time()
+	print 'insert into database spend time :',en - st
 	# #提取分析结果
-	# select.getTopKKeyWord(TopKDiv,Cluster_K)
-	# select.getTopKTitleWord(TopKDiv,Cluster_K)
+	select.getTopKKeyWord(TopKDiv,Cluster_K)
+	select.getTopKTitleWord(TopKDiv,Cluster_K)
 
 #run analysis english
 def runAnalysis_en(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
@@ -115,39 +134,42 @@ def runAnalysis_en(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 	snn = SNN()
 	netLink = NetLink()
 
-	complete_Ids,genreIDs = netLink.getCompleteIds(Input_Ids)
+	# complete_Ids,genreIDs = netLink.getCompleteIds(Input_Ids)
 	# print len(complete_Ids)
-	#real
-	keyWords = data.getDataByID_ch(complete_Ids)
-	# keyWords = data.delRepeatWord(keyWords)
-	select.writeObj(keyWords,"com_keyWords.txt")
+	# #real
+	# keyWords = data.getDataByID_ch(complete_Ids)
+	# # keyWords = data.delRepeatWord(keyWords)
+	# select.writeObj(keyWords,"com_keyWords.txt")
 
-	#for test 
-	# keyWords = select.readObj("com_keyWords.txt")
+	# #for test 
+	# # keyWords = select.readObj("com_keyWords.txt")
 
-	print len(keyWords)
-	# # #get think words  获取联想词
-	# # #real
-	thinkWords = think.getThinkWordCluster_en(keyWords)
-	select.writeObj(thinkWords,"thinkWords.txt")
+	# print 'key',len(keyWords)
+	# # # #get think words  获取联想词
+	# # # #real
+	# thinkWords = think.getThinkWordCluster_en(keyWords)
+	# select.writeObj(thinkWords,"thinkWords.txt")
 
-	# thinkWords = select.readObj("thinkWords.txt")
+	# # thinkWords = select.readObj("thinkWords.txt")
 
-	print len(list(set(thinkWords)))
+	# print 'think',len(list(set(thinkWords)))
 
-	# #获取App 的类别下的关联词
-	cwd_Words = cwd.getKeyWordofClassWord_en(genreIDs)
-	select.writeObj(cwd_Words,"cwd_Words.txt")
+	# # #获取App 的类别下的关联词
+	# cwd_Words = cwd.getKeyWordofClassWord_en(genreIDs)
+	# select.writeObj(cwd_Words,"cwd_Words.txt")
 
-	# cwd_Words = select.readObj("cwd_Words.txt")
+	# # cwd_Words = select.readObj("cwd_Words.txt")
 
-	print len(cwd_Words)
+	# print 'extend',len(cwd_Words)
 
-	all_Words = list(set(keyWords+thinkWords+cwd_Words))
-	select.writeObj(all_Words,"all_Words.txt")
+	# all_Words = list(set(keyWords+thinkWords+cwd_Words))
+	# all_Words = data.delRepeatWord_ch(all_Words)
+	# select.writeObj(all_Words,"all_Words.txt")
 
-	# all_Words = select.readObj("all_Words.txt")
-	print len(all_Words)
+	all_Words = select.readObj("all_Words.txt")
+	print 'all',len(all_Words)
+	all_Words = data.delRepeatWord_ch(all_Words)
+	print 'all',len(all_Words)
 
 	# # #for test
 	# # #获取词的信息(词，词热，searchCount,genre)
@@ -156,7 +178,7 @@ def runAnalysis_en(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 	select.writeObj(WordNews,"WordNews.txt")
 
 	# WordNews  = select.readObj("WordNews.txt")
-	print len(WordNews)
+	print 'news',len(WordNews)
 
 	# # #cluster word 
 	# # # build matrix 
@@ -166,7 +188,7 @@ def runAnalysis_en(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 	# resualt = snn.cluster(Matrix)
 	# resualt = snn.unLearncluster(Matrix)
 
-	print len(Matrix),len(resualt)
+	print 'resault',len(Matrix),len(resualt)
 	# # 写入到数据库
 	sim = np.zeros(len(resualt))	# all_Words = data.delRepeatWord(all_Words)
 	select.insert_data(WordNews,sim,resualt)
@@ -175,14 +197,16 @@ def runAnalysis_en(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 	select.getTopKKeyWord(TopKDiv,Cluster_K)
 	select.getTopKKeyWord(TopKDiv,Cluster_K)
 
-
 def main():
 
 	
 	#input  parameters
 	# Input_Ids = [994120614,1111594089,962734163]
 	# Input_Ids = ['994120614','1111594089','962734163']
-	Input_Ids = ['882307119','834878585','685462046']
+	# Input_Ids = ['882307119','834878585','685462046'] xiao xingxing
+	# Input_Ids = ['791532221','834878585','882307119','1023663634','654897098']   #chinese
+	# Input_Ids = ['692412579','945566094','553834731','479536744','916281743']
+	Input_Ids = ['909351158','1089040107','1076818798','938120863','953522237']
 	# genreIDs = ['6014','7014','6016','7008','7015','6024']
 	# Input_Ids = ['998466140','639486670']
 	Cluster_K = 20

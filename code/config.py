@@ -12,7 +12,7 @@ database_chi = 'mysql_anqu_chi' #chinese
 database_japan = 'mysql_anqu_japan' #japanese
 # add your database depend on your need
 # database_XXX  
-dataBase = database_chi
+dataBase = database_en
 dataBase_port = 3306    #config to your database port 
 dataBase_user = 'root'  #config to your database user
 dataBase_passwd = 'root'#config to your database user's password

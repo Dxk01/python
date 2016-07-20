@@ -22,23 +22,29 @@ class NetLink():
 
 	def getUrlData(self,Id = '620112416',dev_ty = 1):
 		Url = self.urlHead+Id+self.urlMi+str(dev_ty)+self.urlTail
-		# print Url
+		print Url
 		data = urllib2.urlopen(Url).read()
 		start = data.find('(')
 		data = data[start+1:len(data)-1]
 		jD = parser.JsDomParser(data).parse()
 		return jD
 
-	def getCompleteIds(self,Ids= ['620112416','504634395'],dev_ty = 1):
+	def getCompleteIds(self,Ids= ['1007855348','504634395'],dev_ty = 1):
 		complete_Ids = []
 		genreIds = []
 		for Id in Ids:
 			Jsoncontext = self.getUrlData(Id,dev_ty)
+			if Jsoncontext == None:
+				continue
 			complete_Ids.extend(Jsoncontext['customersAlsoBoughtApps'])
 			complete_Ids.append(Id)
-			 # Jsoncontext['result']['genres']
+			if Jsoncontext['result'] == None:
+				continue
+			if Jsoncontext['result']['genres'] == None:
+				continue
 			genre_r = self.getCompleteGenreID(Jsoncontext['result']['genres'])
 			genreIds.extend(genre_r)
+			
 		complete_Ids = list(set(complete_Ids))
 		genreIds = list(set(genreIds))
 		return complete_Ids,genreIds

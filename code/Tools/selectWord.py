@@ -116,13 +116,14 @@ class selectWord():
 	#获得当前品类词前Top K的维度词结果
 	def getTopKClassWord(self,topWord=20,top_K=4):
 		mysql = mysql_op.mysql_op()
-		top_kClusters = mysql.select("select cluster from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
+		top_kClusters = mysql.getWordPriority("select cluster,avg(priority),avg(searchCount) from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
 		Datas = []
 		for cluster in top_kClusters:
-			data = mysql.getWordPriority('select * from wordSelectFeature where cluster =%d and searchCount > 4500 order by priority desc limit %d'%(cluster,topWord*2))
-			# for word in data:
-			# 	if len(word[0]) <= 1 or len(word[0]) > 10:
-			# 		data.remove(word)
+			sql = 'select * from wordSelectFeature where cluster =%d and priority > %d and searchCount > %d order by priority desc'%(cluster[0],cluster[1],cluster[2]+1000)
+			data = mysql.getWordPriority(sql)
+			for word in data:
+				if len(word[0]) <= 1 or len(word[0]) > 10:
+					data.remove(word)
 			Datas.append(data[0:topWord])
 		self.write_to_local(Datas,topWord,'ClassWord',2)
 		return Datas   #k组词，每组词包含与其相关的信息
@@ -132,10 +133,10 @@ class selectWord():
 		re_datas = []
 		for data in Datas:
 			datas = []
-			# for word in data:
-			# 	if len(word[0]) < 10 and  len(word[0]) > 1:
-			# 		datas.append(word)
-			re_datas.append(data)
+			for word in data:
+				if len(word[0]) < 10 and  len(word[0]) > 1:
+					datas.append(word)
+			re_datas.append(datas)
 		return re_datas
 
 	#计算品类词的关联特性下，更新各关键词的权重
@@ -147,7 +148,6 @@ class selectWord():
 				word_v = word[1]
 				for cWord in classWords[i]:
 					if cWord[0] in word[0] and len(cWord[0]) > 1: #or word[0] in cWord[0]:
-						# print word[0],cWord[0]
 						word_v = word_v + 200
 				re_data.append([word[0],word_v,word[2],word[3],word[4]])
 			sorted(re_data, key = lambda asd:asd[1],reverse=True)
@@ -158,10 +158,10 @@ class selectWord():
 	def getTopKKeyWord(self,topWord=20,top_K=4):
 		classWords = self.getTopKClassWord(topWord,top_K)
 		mysql = mysql_op.mysql_op()
-		top_kClusters = mysql.select("select cluster from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
+		top_kClusters = mysql.getWordPriority("select cluster,avg(priority),avg(searchCount) from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
 		Datas = []
 		for cluster in top_kClusters:
-			sql = 'select * from wordSelectFeature where cluster =%d and searchCount < 1500 and priority < 6000 order by priority desc'%cluster
+			sql = 'select * from wordSelectFeature where cluster = %d and priority > %d and searchCount < %d order by priority desc'%(cluster[0],cluster[1],cluster[2])
 			data = mysql.getWordPriority(sql)
 			Datas.append(data)
 		Datas = self.getTopKKeyWordNotLong(Datas)
@@ -178,7 +178,11 @@ class selectWord():
 		Datas = []
 		sql = 'select * from ansearchApp where priority > 7000 order by priority desc'
 		data = mysql.getWordPriority(sql)
-		Datas.append(data)
+		re_data = []
+		for word in data:
+			if len(word[0]) < 10 and len(word[0]) > 1:
+				re_data.append(word)
+		Datas.append(re_data[0:2*topWord])
 		self.write_to_local(Datas,topWord*2,'TopTitle',3)
 		return Datas
 
@@ -200,7 +204,8 @@ class selectWord():
 		for KeyWords in Datas:
 			if KeyWords == None or len(KeyWords) == 0:
 				continue
-			fp.write("第  %d  维度       Top  %d 关键词        Cluster : %d\n"%(count,topWord,KeyWords[0][4]))
+			if type != 3:
+				fp.write("第  %d  维度       Top  %d 关键词        Cluster : %d\n"%(count,topWord,KeyWords[0][4]))
 			for word in KeyWords:
 					fp.write(word[0] + ':'+str(word[1])+" | ")  #+str(word[1])+"   "+str(word[2])+"  "+str(word[4])+"\n"
 			count += 1
