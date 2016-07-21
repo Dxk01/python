@@ -35,10 +35,11 @@
 # if __name__ == '__main__':
 # 	main()
 
-from socket import *
+from socket import *	
 import time
 
-host = '127.0.0.1'
+# host = '127.0.0.1'
+host = '192.168.238.128'
 port = 9998
 bufsize = 1024
 addr = (host,port)
@@ -49,11 +50,11 @@ while True:
     data = '/home/mysql1/anqu/analysisResault/ClassWord/'
     if not data or data=='exit':
         break
-    client.send('%s\r\n' % data)
+    client.send('%s' % data)
     data = client.recv(bufsize)
     if not data:
         break
-    print data.strip()
+    print data.strip()+'\n'
     time.sleep(5)
 client.close()
 

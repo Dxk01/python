@@ -369,8 +369,22 @@ class data_deal():
 			Iddic.setdefault(Id,key)
 		return Iddic
 
+	#test data 
+	def testData(self):
+		sql = 'select * from searchApp'
+		data = self.mysql.getWordPriority(sql)
+		f = open('/home/mysql1/anqu/analysisResault/TestInputFile/searchappT.txt','ab')
+		for word in data:
+			wordstr = ''
+			for d in xrange(len(word)-1):
+				wordstr += str(word[d]) + '###'
+			wordstr += str(word[len(word)-1]) + '^^^'
+			f.write(wordstr)
+		f.close()
+
 def main():
 	data_d = data_deal()
+	data_d.testData()
 	# da = {'1':1,'2':2,'3':3}
 	# if da.has_key('1'):
 		# print 1

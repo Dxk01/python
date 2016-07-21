@@ -119,7 +119,7 @@ class selectWord():
 		top_kClusters = mysql.getWordPriority("select cluster,avg(priority),avg(searchCount) from wordSelectFeature group by cluster order by avg(relevancy) desc limit %d"%top_K)
 		Datas = []
 		for cluster in top_kClusters:
-			sql = 'select * from wordSelectFeature where cluster =%d and priority > %d and searchCount > %d order by priority desc'%(cluster[0],cluster[1],cluster[2]+1000)
+			sql = 'select * from wordSelectFeature where cluster =%d and priority > %d and searchCount > %d order by priority desc'%(cluster[0],cluster[1],cluster[2]+500)
 			data = mysql.getWordPriority(sql)
 			for word in data:
 				if len(word[0]) <= 1 or len(word[0]) > 10:
@@ -234,7 +234,7 @@ def main():
 	# select.getTopKClassWord(30,20)
 
 	select.getTopKKeyWord(50,20)
-	select.getTopKTitleWord(50,20)
+	# select.getTopKTitleWord(50,20)
 
 
 if __name__ == '__main__':

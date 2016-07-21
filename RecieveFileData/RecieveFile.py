@@ -6,6 +6,7 @@
 import ftplib
 import os
 import sys
+from chinese import chinese as cn
 
 class RecieveFile():
 	def __init__(self):
@@ -63,6 +64,10 @@ class RecieveFile():
 		return []
 
 	#download remote files to local
+
+
+
+
 	def getFilestoLocal(self,RemoteFilePath,LocalFilePath='/home/mysql1/anqu/analysisResault/TestFile/'):
 		remotefile = RemoteFilePath
 		if os.path.isdir(LocalFilePath) == False:
@@ -72,7 +77,45 @@ class RecieveFile():
 		file_list = self.file_list(remotefile)
 		for file in file_list:
 			print file
-			self.getFiletoLocal(file,remotefile)
+			if 'searchapp' in file:
+				self.deal_FileData_SearchApp(file,remotefile)
+
+	def deal_Word(self,word):
+		chi = cn()
+		if chi.is_chinese(word) == False:
+			return False
+		if len(word) < 1 or len(word) > 12:
+			return False
+		if chi.is_punctuation(word):
+			return False
+		if self.worddic.has_key(word):
+			return False
+		self.worddic.setdefault(word)
+		return True
+
+	def deal_FileData_SearchApp(self,file,remotefile):
+		min_s = ''
+		i = 0
+		for data in self.getFileBlock(file,remotefile):
+			data_list = []
+			if '^^^' not in data:
+				min_s += data
+				if '^^^' not in min_s:
+					continue
+				else:
+					data = min_s
+					min_s = ''
+			data_list = data.split('^^^')
+			data_list[0] = min_s + data_list[0]
+			self.worddic = {}
+			word_list = []
+			for i in xrange(len(data_list)-1):
+				word_data = data_list[i].split('###')
+				if self.deal_Word(word_data[0].decode('utf8')):
+					word_list.append(word_data)
+			min_s = data_list[len(data_list)-1]
+
+			# print data_list add code deal data insert   word_list
 
 	# download remote file to local
 	def getFiletoLocal(self,filename,RemoteFilePath,LocalFilePath='/home/mysql1/anqu/analysisResault/TestFile/'):
@@ -113,7 +156,7 @@ class RecieveFile():
 			self.conn.cwd(RemoteFilePath)
 			fsize = self.conn.size(filename)
 			if fsize == 0:
-				return 
+				return
 			# check local file isn't exists and get the local file size
 			lsize = 0
 			cmpsize = lsize
@@ -150,10 +193,11 @@ class RecieveFile():
 
 def main():
 	rf = RecieveFile()
-	rf.login()
-	RemoteFilePath = '/home/mysql1/anqu/analysisResault/ClassWord/'
-	LocalFilePath = '/home/mysql1/anqu/analysisResault/TestFile/'
-	rf.getFilestoLocal(RemoteFilePath,LocalFilePath)
+	# print_code()
+	# rf.login()
+	# RemoteFilePath = '/home/mysql1/anqu/analysisResault/TestInputFile/'
+	# LocalFilePath = '/home/mysql1/anqu/analysisResault/TestOutPutFile/'
+	# rf.getFilestoLocal(RemoteFilePath,LocalFilePath)
 	# rf.close()
 
 if __name__ == '__main__':
