@@ -3,17 +3,26 @@
 # Writer : lgy
 # dateTime : 2016-07-20
 
+import sys
+sys.path.append('/home/mysql1/anqu/python/code/Tools')
+sys.path.append('/home/mysql1/anqu/python/insertDataHql')
+reload(sys)
+sys.setdefaultencoding('utf8') 
+
 import ftplib
 import os
-import sys
-from chinese import chinese as cn
+from wordLanguedge import WordLanguedge as wl
+from selectWord import selectWord as SW
+from HqlSpark import HqlSpark as hs
 
 class RecieveFile():
 	def __init__(self):
 		# self.Link_Host = '127.0.0.1'
 		# self.Link_Port = 2020
 		# self.filePath = '/home/mysql1/anqu/analysisResault/ClassWord'
-		pass
+		self.rhs = hs()
+		self.chi = wl()
+		# pass
 
 	#login in 
 	def login(self,Host='127.0.0.1',Port=21,user='mysql1',passwd='mysql'):
@@ -64,10 +73,6 @@ class RecieveFile():
 		return []
 
 	#download remote files to local
-
-
-
-
 	def getFilestoLocal(self,RemoteFilePath,LocalFilePath='/home/mysql1/anqu/analysisResault/TestFile/'):
 		remotefile = RemoteFilePath
 		if os.path.isdir(LocalFilePath) == False:
@@ -76,26 +81,31 @@ class RecieveFile():
 		print 'start ... ...'
 		file_list = self.file_list(remotefile)
 		for file in file_list:
-			print file
 			if 'searchapp' in file:
-				self.deal_FileData_SearchApp(file,remotefile)
+				# print file[10:12]
+				print file
+				self.deal_FileData_SearchApp(file,remotefile,file[10:12])
 
-	def deal_Word(self,word):
-		chi = cn()
-		if chi.is_chinese(word) == False:
+	def deal_Word(self,word,file_type):
+		if self.chi.which_languedge(word.decode('utf8'),file_type) == False:
 			return False
 		if len(word) < 1 or len(word) > 12:
 			return False
-		if chi.is_punctuation(word):
+		if self.chi.is_punctuation(word.decode('utf8')):
 			return False
-		if self.worddic.has_key(word):
-			return False
-		self.worddic.setdefault(word)
 		return True
 
-	def deal_FileData_SearchApp(self,file,remotefile):
+	# deal data and insert into dataBase
+	def deal_FileData_SearchApp(self,file,remotefile,d_type='cn'):
 		min_s = ''
 		i = 0
+		selectword = SW()
+		word_Data = []
+		word_list = []
+		state_f = False
+		count = 0
+		blockSize = 1024*1024*1
+		print blockSize
 		for data in self.getFileBlock(file,remotefile):
 			data_list = []
 			if '^^^' not in data:
@@ -107,19 +117,33 @@ class RecieveFile():
 					min_s = ''
 			data_list = data.split('^^^')
 			data_list[0] = min_s + data_list[0]
-			self.worddic = {}
-			word_list = []
+			
+			# print len(data_list)
 			for i in xrange(len(data_list)-1):
 				word_data = data_list[i].split('###')
-				if self.deal_Word(word_data[0].decode('utf8')):
+				if self.deal_Word(word_data[0].decode('utf8'),d_type):
+					lonSize = sys.getsizeof(word_list)
+					daSize = sys.getsizeof(word_data)
+					# print lonSize,daSize
+					if lonSize+daSize > blockSize:
+						self.rhs.insertDataFromStruct(word_list,d_type,state_f)
+
+						# SW().writeObj(word_list,'word_list.txt')
+						state_f = True
+						word_list = []
 					word_list.append(word_data)
 			min_s = data_list[len(data_list)-1]
-
-			# print data_list add code deal data insert   word_list
+		# if state_f :
+		# 	break
+		self.rhs.refreshTable('search_'+d_type)
+		# if sys.getsizeof(word_list) > 0:
+		# 	print len(word_list)
+		# 	self.rhs.insertDataFromStruct(word_list,d_type,state_f)
+		# 	# SW().writeObj(word_list,'word_list.txt')
+		# 	state_f = True
 
 	# download remote file to local
 	def getFiletoLocal(self,filename,RemoteFilePath,LocalFilePath='/home/mysql1/anqu/analysisResault/TestFile/'):
-		print filename
 		if self._is_ftp_file(RemoteFilePath+filename):
 			self.conn.cwd(RemoteFilePath)
 			fsize = self.conn.size(filename)
@@ -133,13 +157,15 @@ class RecieveFile():
 			if lsize >= fsize:
 				print 'local file is bigger or equal remote file'
 				return 
-			blockSize = 1024*1024   #size 1M
+			blockSize = 1024*1024   #size 128M
+			print blockSize
 			cmpsize = lsize
 			self.conn.voidcmd('TYPE I')
 			rfile = self.conn.transfercmd('RETR '+filename,lsize)
 			f_write = open(LocalFilePath+filename,'ab')
 			while True:
 				data = rfile.recv(blockSize)
+				print sys.getsizeof(data)
 				if not data:
 					break
 				f_write.write(data)
@@ -161,15 +187,22 @@ class RecieveFile():
 			lsize = 0
 			cmpsize = lsize
 			blockSize = 1024*1024   #size 1M
+			MaxBlockSize = 64*blockSize
 			self.conn.voidcmd('TYPE I')
 			rfile = self.conn.transfercmd('RETR '+filename,lsize)
+			data_buff = u''
 			while True:
 				data = rfile.recv(blockSize)
+				# print sys.getsizeof(data)/(1024*1024)
+				# data_buff += data
+				# if sys.getsizeof(data_buff) <= MaxBlockSize and sys.getsizeof(data_buff+data) > MaxBlockSize:
+					# print sys.getsizeof(data_buff)/(1024*1024)
 				yield data
+					# data_buff = data
 				if not data:
 					break
 				cmpsize += len(data)
-				print 'read process:%.2f%%'%(float(cmpsize)/fsize*100)
+				# print 'read process:%.2f%%'%(float(cmpsize)/fsize*100)
 			self.conn.voidcmd('NOOP')
 			self.conn.voidresp()
 			rfile.close()
@@ -178,27 +211,20 @@ class RecieveFile():
 	def getFileContext(self,file,RemoteFilePath,d_type):  #d_type mark file type chose method 
 		#add code deal file 
 		for data in self.getFileBlock(file,RemoteFilePath):
-			print data
-		pass
-	
-	#
+			pass
 	#close connect 
 	def close(self):
 		self.conn.close()
 
 
-	def recieveFile(self,filePath):
-		pass
-
-
 def main():
 	rf = RecieveFile()
 	# print_code()
-	# rf.login()
-	# RemoteFilePath = '/home/mysql1/anqu/analysisResault/TestInputFile/'
-	# LocalFilePath = '/home/mysql1/anqu/analysisResault/TestOutPutFile/'
-	# rf.getFilestoLocal(RemoteFilePath,LocalFilePath)
-	# rf.close()
+	rf.login()
+	RemoteFilePath = '/home/mysql1/anqu/analysisResault/TestInputFile/'
+	LocalFilePath = '/home/mysql1/anqu/analysisResault/TestOutPutFile/'
+	rf.getFilestoLocal(RemoteFilePath,LocalFilePath)
+	rf.close()
 
 if __name__ == '__main__':
 	main()

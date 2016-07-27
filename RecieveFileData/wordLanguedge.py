@@ -5,9 +5,10 @@
 
 import re
 
-class chinese():
+class WordLanguedge():
 	def __init__(self):
-		pass
+		self.initFuncation()
+		# pass
 
 	#判断是都包含中文
 	def is_chinese(self,c_str):
@@ -15,13 +16,18 @@ class chinese():
 		#一个小应用，判断一段文本中是否包含简体中：
 		# contents=u'一个小应用，判断一段文本中是否包含简体中：'
 		match = zhPattern.search(c_str)
+		# print match
 		if match:
-			an = re.compile(u'[^\u4e00-\u9fa5,^\s,\d]+')
+			# print ''
+			an = re.compile(u'[^\u4e00-\u9fa5,^\w]+')
 			ma = an.search(c_str)
 			if ma:
 				# print ma.group(0)
 				return False
-		return True
+			else:
+				return True
+		else:
+			return False
 
 	def is_english(self,word):
 		if word.isalnum():
@@ -64,19 +70,18 @@ class chinese():
 		return True
 	#judge word is Russian
 	def is_Russian(self,c_str):
-		zhPattern = re.compile(u'[\u0400-\u1279,\s]+')
+		zhPattern = re.compile(u'[\u0410-\u044f,\s]+')
 		# an = re.compile('')
 		#一个小应用，判断一段文本中是否包含japan：
 		# contents=u'一个小应用，判断一段文本中是否包含japan'
 		match = zhPattern.search(c_str)
 		if match:
-			an = re.compile(u'[^\u0400-\u1279,^\s,^\u0000-\u007F,^\d]+')
+			an = re.compile(u'[^\u0410-\u044f,^\s,^\d]+')
 			ma = an.search(c_str)
 			if ma:
 				# print ma.group(0)
 				return False
 		return True
-
 	#judge word is french
 	def is_French(self,c_str):
 		zhPattern = re.compile(u'[\u0400-\u1279,\s]+')
@@ -92,26 +97,45 @@ class chinese():
 				return False
 		return True
 
+	#init func 
+	def initFuncation(self):
+		print 'init funcation which languedge'
+		self.functions = {
+		'cn':self.is_chinese,
+		'us':self.is_english,
+		'en':self.is_english,
+		'fr':self.is_French,
+		'ge':self.is_Germen,
+		'ru':self.is_Russian,
+		'ta':self.is_chinese_traditional,
+		'jp':self.is_japanese
+		}
+
+	#judge a word is Traditional chinese (TaiWan)
+	def is_chinese_traditional(self,c_str):
+		return False
+	#fun point 
+	def which_languedge(self,c_str,ltype='ru'):
+		return self.functions[ltype](c_str)
 	#judge word is germen
-	def is_Germen
+	def is_Germen():
+		return False
+
+	#judge word id 
 
 def print_code():
-	for i in xrange(1024,1279):
-		print u'%c'%i,
+	for i in xrange(1040,1279):
+		print u'%c %04x'%(i,i),
 		if (i-2) % 10 == 0 and i != 0:
 			print ''
 
 def main():
-	chin = chinese()
+	chin = WordLanguedge()
+	chin.initFuncation()
 	print_code()
-	# str_1 = u'微信'
-	# str_2 = u'应用fashkjhdfshajfj fhdsjkahfdhak fdsa'
-	# print ('影视大全','影视大全')
-	# print '360影视大全',"is",chin.is_punctuation('影xx视,.大全')
-	# print str_2,"is",chin.is_chinese(str_2)
-	str_japan = u'Встретились как-то Любовь и Друж'
+	str_japan = u'txt免费全本21小说'
 	print str_japan
-	print chin.is_Russian(str_japan)
+	print chin.which_languedge(str_japan,'cn')
 
 if __name__ == '__main__':
 	main()

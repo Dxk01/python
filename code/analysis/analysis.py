@@ -134,41 +134,41 @@ def runAnalysis_en(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 	snn = SNN()
 	netLink = NetLink()
 
-	# complete_Ids,genreIDs = netLink.getCompleteIds(Input_Ids)
-	# print len(complete_Ids)
-	# #real
-	# keyWords = data.getDataByID_ch(complete_Ids)
-	# # keyWords = data.delRepeatWord(keyWords)
-	# select.writeObj(keyWords,"com_keyWords.txt")
+	complete_Ids,genreIDs = netLink.getCompleteIds(Input_Ids)
+	print len(complete_Ids)
+	#real
+	keyWords = data.getDataByID_ch(complete_Ids)
+	# keyWords = data.delRepeatWord(keyWords)
+	select.writeObj(keyWords,"com_keyWords.txt")
 
-	# #for test 
-	# # keyWords = select.readObj("com_keyWords.txt")
+	#for test 
+	# keyWords = select.readObj("com_keyWords.txt")
 
-	# print 'key',len(keyWords)
-	# # # #get think words  获取联想词
-	# # # #real
-	# thinkWords = think.getThinkWordCluster_en(keyWords)
-	# select.writeObj(thinkWords,"thinkWords.txt")
+	print 'key',len(keyWords)
+	# # #get think words  获取联想词
+	# # #real
+	thinkWords = think.getThinkWordCluster_en(keyWords)
+	select.writeObj(thinkWords,"thinkWords.txt")
 
-	# # thinkWords = select.readObj("thinkWords.txt")
+	# thinkWords = select.readObj("thinkWords.txt")
 
-	# print 'think',len(list(set(thinkWords)))
+	print 'think',len(list(set(thinkWords)))
 
-	# # #获取App 的类别下的关联词
-	# cwd_Words = cwd.getKeyWordofClassWord_en(genreIDs)
-	# select.writeObj(cwd_Words,"cwd_Words.txt")
+	# #获取App 的类别下的关联词
+	cwd_Words = cwd.getKeyWordofClassWord_en(genreIDs)
+	select.writeObj(cwd_Words,"cwd_Words.txt")
 
-	# # cwd_Words = select.readObj("cwd_Words.txt")
+	# cwd_Words = select.readObj("cwd_Words.txt")
 
-	# print 'extend',len(cwd_Words)
+	print 'extend',len(cwd_Words)
 
-	# all_Words = list(set(keyWords+thinkWords+cwd_Words))
-	# all_Words = data.delRepeatWord_ch(all_Words)
-	# select.writeObj(all_Words,"all_Words.txt")
-
-	all_Words = select.readObj("all_Words.txt")
-	print 'all',len(all_Words)
+	all_Words = list(set(keyWords+thinkWords+cwd_Words))
 	all_Words = data.delRepeatWord_ch(all_Words)
+	select.writeObj(all_Words,"all_Words.txt")
+
+	# all_Words = select.readObj("all_Words.txt")
+	# print 'all',len(all_Words)
+	# all_Words = data.delRepeatWord_ch(all_Words)
 	print 'all',len(all_Words)
 
 	# # #for test
@@ -195,7 +195,6 @@ def runAnalysis_en(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 
 	# #提取分析结果
 	select.getTopKKeyWord(TopKDiv,Cluster_K)
-	select.getTopKKeyWord(TopKDiv,Cluster_K)
 
 def main():
 
@@ -206,7 +205,9 @@ def main():
 	# Input_Ids = ['882307119','834878585','685462046'] xiao xingxing
 	# Input_Ids = ['791532221','834878585','882307119','1023663634','654897098']   #chinese
 	# Input_Ids = ['692412579','945566094','553834731','479536744','916281743']
-	Input_Ids = ['1001855348','1053012308','890220657','689856926','954952106']
+	# Input_Ids = ['1102362078','1065802303','1087318096','432278570','949933983']
+	#Input_Ids = ['510582247','1106842267','689180123']
+	Input_Ids = ['687588540','789680891','1040062076','731871690']
 	# genreIDs = ['6014','7014','6016','7008','7015','6024']
 	# Input_Ids = ['998466140','639486670']
 	Cluster_K = 20
