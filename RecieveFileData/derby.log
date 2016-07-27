@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Wed Jul 27 17:38:37 CST 2016:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0156-2bb8-5b09-000068f7b528 
-on database directory /home/mysql1/anqu/python/RecieveFileData/metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@61fdeca9 
+Wed Jul 27 18:36:59 CST 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.10.1.1 - (1458268): instance a816c00e-0156-2bed-cb6a-0000674c4230 
+on database directory /home/mysql1/anqu/python/RecieveFileData/metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@3e02dad6 
 Loaded from file:/home/mysql1/spark/lib/spark-assembly-1.6.2-hadoop2.6.0.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_71-b15
