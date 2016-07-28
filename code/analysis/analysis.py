@@ -105,6 +105,7 @@ def runAnalysis_ch(Input_Ids,Cluster_K = 20,div = 20,TopKDiv = 50):
 	# # # # build matrix 
 	st = time.time()
 	Matrix = data.calMatrixByWordNews(WordNews)
+	select.writeObj(Matrix,'Matrix.txt')
 	# # # # cluster
 	resualt = ckm.cluster_k_means(Matrix,Cluster_K)
 	en = time.time()

@@ -19,10 +19,18 @@ class HqlSpark():
 	# init Spark sql 
 	def __init__(self):
 		self.conf = SparkConf().setAppName("my_hive")
-		print type(self.conf)
-			# print da
 		self.sc = SparkContext(conf=self.conf)
 		self.sql = HiveContext(self.sc)
+		database = self.sql.sql('show databases').collect()
+		have_hive = True
+		for data in database:
+			if 'myhive'.find(data['result']) >= 0:
+				have_hive = False
+		if have_hive :
+			print 'init myhive database!'
+			self.sql.sql('create database myhive')
+		self.sql.sql('use myhive')
+		# print self.sql.sql("show tables").collect()
 
 	def refreshTable(self,tableName):
 		self.sql.refreshTable(tableName)
@@ -43,14 +51,10 @@ class HqlSpark():
 		# rdd = self.sc.parallelize(data)
 		in_data = self.sql.createDataFrame(data,als.searchApp_shame)
 		# final_data = in_data
-		final_data = in_data.dropDuplicates(["word",])
-		del(in_data)
-		final_data = final_data.collect()
-		final_data = self.sql.createDataFrame(final_data,als.searchApp_shame)
 		if state:
-			final_data.saveAsTable(tableName='searchapp_'+d_type,Source='metastore_db',mode='append')#   append  overwrite
+			in_data.saveAsTable(tableName='searchapp_'+d_type,Source='metastore_db',mode='append')#   append  overwrite
 		else:
-			final_data.saveAsTable(tableName='searchapp_'+d_type,Source='metastore_db',mode='overwrite')
+			in_data.saveAsTable(tableName='searchapp_'+d_type,Source='metastore_db',mode='overwrite')
 
 	# delete table 
 	def deleteDataFromTable(self,table='searchapp_',d_type='ch'):
@@ -58,17 +62,32 @@ class HqlSpark():
 		self.sql.dropTempTable(table+d_type)
 		self.sql.refreshTable(table+d_type)
 
+	def showTales(self):
+		table_list = []
+		tables = self.sql.sql('show tables').collect()
+		for table in  tables:
+			table_list.append(table['tableName'])
+		return table_list
+
 	def getData(self,sql_hive):
-		pass
+		# self.sql.registerDataFrameAsTable(self.sql,'searchapp_cn')
+		datas = self.sql.sql(sql_hive).collect()
+		return datas
+		# for data in datas:
+			# print data
 		
 def main():
 	hqlS = HqlSpark()
-	# hqlS.createTable('create table wordSelectFeature (word varchar(255),priority int,searchCount int,relevancy float,cluster int)')
+	# hqlS.createTable('create table searchapp (word string,priority string,searchapp string,searchCount string,genre string,type string,time string)')
 	# hqlS.insertData('insert into wordSelectFeature values(\'indianapolis indians\',4605,289,0,1)')
-	# hqlS.getData('select * from searchapp_cn limit 1')
+	# print hqlS.getData('select * from searchapp_cn limit 10')
 	# hqlS.deleteDataFromTable(table='searchapp',d_type='')
 	# data = sw().readObj('word_list.txt')
-	# hqlS.insertDataFromStruct(data,d_type = 'cn',state=False)
-	hqlS.deleteDataFromTable()
+	# hqlS.insertDataFromStruct(data[1:10],d_type = 'cn',state=False)
+	# print hqlS.getData('select * from searchapp_cn limit 10')
+	# hqlS.deleteDataFromTable()
+	re = hqlS.showTales()
+	for r in re:
+		print r
 if __name__ == '__main__':
 	main()

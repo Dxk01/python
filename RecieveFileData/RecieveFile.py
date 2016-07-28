@@ -31,7 +31,7 @@ class RecieveFile():
 		self.conn.connect(Host,Port)
 		self.conn.login(user,passwd)
 		self.conn.set_pasv(False)
-		print self.conn.getwelcome()
+		print self.conn.getwelcome()+'\nWelcome connect ftp!'
 
 	# judge filepath is file or not 
 	def _is_ftp_file(self,ftp_path):
@@ -77,22 +77,25 @@ class RecieveFile():
 		remotefile = RemoteFilePath
 		if os.path.isdir(LocalFilePath) == False:
 			os.makedirs(LocalFilePath)
-		print self._is_ftp_dir(os.path.basename(remotefile))
 		print 'start ... ...'
-		file_list = self.file_list(remotefile)
-		for file in file_list:
-			if 'searchapp' in file:
-				# print file[10:12]
-				print file
-				self.deal_FileData_SearchApp(file,remotefile,file[10:12])
+		if self._is_ftp_dir(remotefile):#os.path.basename(remotefile))
+			file_list = self.file_list(remotefile)
+			for file in file_list:
+				if 'searchapp' in file:
+					# print file[10:12]
+					print file
+					self.deal_FileData_SearchApp(file,remotefile,file[10:12])
 
 	def deal_Word(self,word,file_type):
-		if self.chi.which_languedge(word.decode('utf8'),file_type) == False:
-			return False
 		if len(word) < 1 or len(word) > 12:
+			return False
+		if self.chi.which_languedge(word.decode('utf8'),file_type) == False:
 			return False
 		if self.chi.is_punctuation(word.decode('utf8')):
 			return False
+		if self.dic_w.has_key(word):
+			return False
+		self.dic_w.setdefault(word)
 		return True
 
 	# deal data and insert into dataBase
@@ -101,11 +104,11 @@ class RecieveFile():
 		i = 0
 		selectword = SW()
 		word_Data = []
-		word_list = []
 		state_f = False
 		count = 0
-		blockSize = 1024*1024*1
-		print blockSize
+
+		self.dic_w = {}
+
 		for data in self.getFileBlock(file,remotefile):
 			data_list = []
 			if '^^^' not in data:
@@ -117,30 +120,18 @@ class RecieveFile():
 					min_s = ''
 			data_list = data.split('^^^')
 			data_list[0] = min_s + data_list[0]
+			word_list = []
 			
 			# print len(data_list)
 			for i in xrange(len(data_list)-1):
 				word_data = data_list[i].split('###')
 				if self.deal_Word(word_data[0].decode('utf8'),d_type):
-					lonSize = sys.getsizeof(word_list)
-					daSize = sys.getsizeof(word_data)
-					# print lonSize,daSize
-					if lonSize+daSize > blockSize:
-						self.rhs.insertDataFromStruct(word_list,d_type,state_f)
-
-						# SW().writeObj(word_list,'word_list.txt')
-						state_f = True
-						word_list = []
 					word_list.append(word_data)
 			min_s = data_list[len(data_list)-1]
-		# if state_f :
-		# 	break
-		self.rhs.refreshTable('search_'+d_type)
-		# if sys.getsizeof(word_list) > 0:
-		# 	print len(word_list)
-		# 	self.rhs.insertDataFromStruct(word_list,d_type,state_f)
-		# 	# SW().writeObj(word_list,'word_list.txt')
-		# 	state_f = True
+			# print len(word_list)
+			self.rhs.insertDataFromStruct(word_list,d_type,state_f)
+			self.rhs.refreshTable('search_'+d_type)
+			state_f = True
 
 	# download remote file to local
 	def getFiletoLocal(self,filename,RemoteFilePath,LocalFilePath='/home/mysql1/anqu/analysisResault/TestFile/'):
@@ -186,22 +177,23 @@ class RecieveFile():
 			# check local file isn't exists and get the local file size
 			lsize = 0
 			cmpsize = lsize
-			blockSize = 1024*1024   #size 1M
+			blockSize = 1024*1024*40   #*1024   #size 1M  40M
 			MaxBlockSize = 64*blockSize
 			self.conn.voidcmd('TYPE I')
 			rfile = self.conn.transfercmd('RETR '+filename,lsize)
 			data_buff = u''
 			while True:
-				data = rfile.recv(blockSize)
-				# print sys.getsizeof(data)/(1024*1024)
-				# data_buff += data
-				# if sys.getsizeof(data_buff) <= MaxBlockSize and sys.getsizeof(data_buff+data) > MaxBlockSize:
-					# print sys.getsizeof(data_buff)/(1024*1024)
-				yield data
-					# data_buff = data
+				data = rfile.recv(blockSize).decode('utf-8', 'ignore')
+				if sys.getsizeof(data_buff) <= MaxBlockSize and sys.getsizeof(data_buff+data) > MaxBlockSize:
+					print sys.getsizeof(data_buff)/blockSize
+					yield data_buff
+					data_buff = u''
 				if not data:
+					if len(data_buff) > 0:
+						yield data_buff
 					break
 				cmpsize += len(data)
+				data_buff += data
 				# print 'read process:%.2f%%'%(float(cmpsize)/fsize*100)
 			self.conn.voidcmd('NOOP')
 			self.conn.voidresp()
@@ -223,6 +215,7 @@ def main():
 	rf.login()
 	RemoteFilePath = '/home/mysql1/anqu/analysisResault/TestInputFile/'
 	LocalFilePath = '/home/mysql1/anqu/analysisResault/TestOutPutFile/'
+	# print 'fa'
 	rf.getFilestoLocal(RemoteFilePath,LocalFilePath)
 	rf.close()
 
