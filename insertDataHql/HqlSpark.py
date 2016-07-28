@@ -69,5 +69,6 @@ def main():
 	# hqlS.deleteDataFromTable(table='searchapp',d_type='')
 	# data = sw().readObj('word_list.txt')
 	# hqlS.insertDataFromStruct(data,d_type = 'cn',state=False)
+	hqlS.deleteDataFromTable()
 if __name__ == '__main__':
 	main()
