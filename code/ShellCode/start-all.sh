@@ -4,17 +4,19 @@ $!/usr/bash
 # dateTime : 2016-07-27
 # start hadoop , hive , spark
 
+source /etc/profile
+
 # sudo s
 #start hadoop
-filePath=/home/mysql1/ 
-
+hivefilePath=/home/mysql1/anqu/python/RecieveFileData 
+filePath=/home/mysql1
 cd $filePath/hadoop/
 ./sbin/start-dfs.sh
 # ./sbin/start-yarn.sh
 
 #start hive 
-cd $filePath/hive/bin
-source /etc/profile
+cd $hivefilePath
+#source /etc/profile
 hive --service metastore &
 hive --service hiveserver2 &
 

@@ -378,14 +378,15 @@ class data_deal():
 			data = self.mysql.getWordPriority(msql)
 			if data == None or len(data) == 0:
 				break
-			f = open('/home/mysql1/anqu/analysisResault/TestInputFile/searchapp_cn_20160722.txt','ab')
+			f = open('/home/mysql1/anqu/analysisResault/TestInputFile/searchapp_cn_20160729.txt','ab')
 			for word in data:
 				wordstr = ''
 				for d in xrange(len(word)-1):
 					wordstr += str(word[d]) + '###'
-				wordstr += str(word[len(word)-1]) + '^^^'
+				wordstr += str(word[len(word)-1]) + '^^^\n'
 				f.write(wordstr)
 			f.close()
+			break
 
 def main():
 	data_d = data_deal()
