@@ -30,27 +30,31 @@ runfile = '/home/mysql1/anqu/python/anquProduct/Server'
 # you add runfile to your system PATH 
 RecieveFile = runfile+'/RecieveileData'
 insertFile = runfile + '/insertDataHql'
+InitFile = runfile + 'Init'
+ClusterFile = runfile + 'Cluster'
 sparkRunFile1 = '/home/mysql1/spark/python'
 sparkRunFile2 = '/home/mysql1/spark/python/pyspark'
 sparkRunFile3 = '/home/mysql1/spark/python/lib/py4j'
+ToolsFile = runfile + '/Tools'
 
 #data file path for init HiveSql database 
 dataFilePath = '/home/mysql1/anqu/analysisResault/TestInputFile/'
 categoryFilePath = dataFilePath + '_category.txt'
-searchapp_cn = dataFilePath + 'searchapp_cn_20160722.txt'
+searchapp_cn = dataFilePath + 'searchapp_cn_20160801.txt'
+hintword_file = dataFilePath+'hintWord.txt'
 
 
-fileResaultPath = '/home/mysql1/anqu/analysisResault/'  #config the path what you want
-fileClassResaultPath = fileResaultPath + 'ClassWord'
-fileKeyWordResaultPath = fileResaultPath + 'KeyWord'
-fileObjectPath = fileResaultPath + "Object"
-fileRootPath = '/home/mysql1/anqu/python/code/'        #config the path being the point your code was contained ! 
-fileToolsPath = fileRootPath + "Tools"
-fileWordsPath = fileRootPath+'Word'
-fileAnalysisPath = fileRootPath+'analysis'
-fileDataPath = fileRootPath + 'data_deal'
-fileClusterPath = fileRootPath + 'Cluster'
-fileWordAnalysisPath = fileRootPath + 'wordAnalysis'
+# fileResaultPath = '/home/mysql1/anqu/analysisResault/'  #config the path what you want
+# fileClassResaultPath = fileResaultPath + 'ClassWord'
+# fileKeyWordResaultPath = fileResaultPath + 'KeyWord'
+# fileObjectPath = fileResaultPath + "Object"
+# fileRootPath = '/home/mysql1/anqu/python/code/'        #config the path being the point your code was contained ! 
+# fileToolsPath = fileRootPath + "Tools"
+# fileWordsPath = fileRootPath+'Word'
+# fileAnalysisPath = fileRootPath+'analysis'
+# fileDataPath = fileRootPath + 'data_deal'
+# fileClusterPath = fileRootPath + 'Cluster'
+# fileWordAnalysisPath = fileRootPath + 'wordAnalysis'
 
 #系统运行，以来包路径配置
 

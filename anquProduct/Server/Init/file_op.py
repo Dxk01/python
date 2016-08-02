@@ -16,12 +16,21 @@ class file_op():
 		self.searchFile = config.searchapp_cn
 		# add your data file path in the follow:
 
-	def get_category(self):
+	def get_fileData(self,file):
 		c_data = []
-		with open(self.caFile,'r') as f:
+		with open(file,'r') as f:
 			line = f.readline()
 			while line != None and len(line) > 0:
 				c_data.append(line[0:len(line)-2].split(' '))
+				line = f.readline()
+		return c_data
+
+	def get_fileDatasharp(self,file):
+		c_data = []
+		with open(file,'r') as f:
+			line = f.readline()
+			while line != None and len(line) > 0:
+				c_data.append(line[0:len(line)-2].split('###'))
 				line = f.readline()
 		return c_data
 
@@ -39,8 +48,8 @@ class file_op():
 def main():
 	f_op = file_op()
 	# # data = f_op.get_searchSourcedata()
-	for data in f_op.get_category():
-		print data[0]
+	# for data in f_op.get_category():
+	# 	print data[0]
 
 if __name__ == '__main__':
 	main()

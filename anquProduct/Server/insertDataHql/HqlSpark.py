@@ -39,11 +39,11 @@ class HqlSpark():
 		self.sql.refreshTable(tableName)
 
 	#create table 
-	def createTable(self,sql_sentence):
-		table_name = sql_sentence.split(' ')[2]
+	def createTable(self,sql_sentence,tableName):
+		# table_name = sql_sentence.split(' ')[2]
 		self.sql.sql(sql_sentence)
-		self.sql.refreshTable(table_name)
-		print 'create table %s success'%table_name
+		self.sql.refreshTable(tableName)
+		print 'create table success'
 
 	#insert data into table
 	def  insertData(self,sql_sentence):
@@ -52,12 +52,18 @@ class HqlSpark():
 	# insert data into table from data_struct 
 	def insertDataFromStruct(self,data,tableName = 'searchapp_',d_type = 'cn',state=False):   #data tuple or list list   data,
 		# rdd = self.sc.parallelize(data)
-		in_data = self.sql.createDataFrame(data,als.searchApp_shame)
+		if d_type == '':
+			in_data = self.sql.createDataFrame(data,als._categry_shame)
+		elif d_type == 'hint':
+			in_data = self.sql.createDataFrame(data,als.hintWord_shame)
+			d_type = ''
+		else :
+			in_data = self.sql.createDataFrame(data,als.searchApp_shame)
 		# final_data = in_data
 		if state:
-			in_data.saveAsTable(tableName='searchapp_'+d_type,Source='metastore_db',mode='append')#   append  overwrite
+			in_data.saveAsTable(tableName=tableName+d_type,Source='metastore_db',mode='append')#   append  overwrite
 		else:
-			in_data.saveAsTable(tableName='searchapp_'+d_type,Source='metastore_db',mode='overwrite')
+			in_data.saveAsTable(tableName=tableName+d_type,Source='metastore_db',mode='overwrite')
 
 	# delete table 
 	def deleteDataFromTable(self,table='searchapp_',d_type='ch'):
@@ -78,18 +84,36 @@ class HqlSpark():
 		return datas
 		# for data in datas:
 			# print data
+
+	#according input words find hintword from table hintword
+	def selectWord(self,base_words):
+		# base_wordsc = self.sc.parallelize(base_words)
+		base_wordFr = self.sql.createDataFrame(base_words,als.thinkWord_shame)
 		
+		print base_wordFr.collect()
+		# hintWord = self.sql.sql('select word,hintWord from hintword')
+		# data = hintWord.join(base_wordFr,hintWord.hintWord == base_wordFr.hintWord,'outer').select(hintWord.hintWord).collect()
+		# print data
+		# data = []
+		# for word in base_words:
+		# 	# word = \''+word+'\''
+		# 	word = 'hintWord.hintWord=\'%s\''%word
+		# 	data.append(hintWord.filter(word).collect())
+		
+
+
 def main():
 	hqlS = HqlSpark()
+	hqlS.selectWord(['world','travel','tiny','the','poker','nytimes'])
 	# hqlS.createTable('create table searchapp (word string,priority string,searchapp string,searchCount string,genre string,type string,time string)')
 	# hqlS.insertData('insert into wordSelectFeature values(\'indianapolis indians\',4605,289,0,1)')
 	# print hqlS.getData('select * from searchapp_cn limit 10')
 	# hqlS.deleteDataFromTable(table='searchapp',d_type='')
 	# data = sw().readObj('word_list.txt')
 	# hqlS.insertDataFromStruct(data[1:10],d_type = 'cn',state=False)
-	datas = hqlS.getData('select * from searchapp_cn limit 10')
-	for data in datas:
-		print data
+	# datas = hqlS.getData('select * from searchapp_cn limit 10')
+	# for data in datas:
+	# 	print data
 	# hqlS.deleteDataFromTable()
 	# re = hqlS.showTales()
 	# for r in re:

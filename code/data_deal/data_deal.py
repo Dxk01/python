@@ -245,7 +245,6 @@ class data_deal():
 	def getDataByID_en(self,IDs):
 		if IDs == None or len(IDs) == 0:
 			return []
-		
 		chin = chinese()
 		word_re = []
 		blockSize = 10000
@@ -369,28 +368,41 @@ class data_deal():
 			Iddic.setdefault(Id,key)
 		return Iddic
 
+	def gethintword(self):
+		sql = 'select * from hintWord'
+		data = self.mysql.getWordPriority(sql)
+		if data == None or len(data) <= 0:
+			return ''
+		fp = open('/home/mysql1/anqu/analysisResault/TestInputFile/hintWord.txt','ab')
+		for d in data:
+			fp.write(d[0]+'###'+str(d[1])+'###'+str(d[2])+'###'+d[3]+'###'+str(d[4])+'\n')	
+		fp.close()	
 	#test data 
 	def testData(self):
 		blockSize = 10000
 		MaxSize = 20000
+		f = open('/home/mysql1/anqu/analysisResault/TestInputFile/searchapp_cn_20160801.txt','ab')
 		for i in xrange(MaxSize):
 			msql = 'select * from searchApp collect order by word limit %d , %d'%((i*blockSize),blockSize)
 			data = self.mysql.getWordPriority(msql)
 			if data == None or len(data) == 0:
 				break
-			f = open('/home/mysql1/anqu/analysisResault/TestInputFile/searchapp_cn_20160729.txt','ab')
+			
 			for word in data:
 				wordstr = ''
 				for d in xrange(len(word)-1):
 					wordstr += str(word[d]) + '###'
 				wordstr += str(word[len(word)-1]) + '^^^\n'
 				f.write(wordstr)
-			f.close()
-			break
+			# if i > 5:
+			# 	break
+		f.close()
+			# break
 
 def main():
 	data_d = data_deal()
-	data_d.testData()
+	data_d.gethintword()
+	# data_d.testData()
 	# da = {'1':1,'2':2,'3':3}
 	# if da.has_key('1'):
 		# print 1
