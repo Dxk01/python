@@ -14,26 +14,30 @@ import config
 from pyspark import SparkConf,SparkContext
 from pyspark.sql import HiveContext
 from pyspark.sql.types import StructType,StructField,IntegerType,StringType,LongType
-# from selectWord import selectWord as sw
+from pyspark.sql import functions
 from pyspark.sql import Row
 import all_shame as als
+import numpy
+import time
 
 class HqlSpark():
 	# init Spark sql 
-	def __init__(self):
+	def __init__(self,language = 'cn'):
 		self.conf = SparkConf().setAppName("my_hive")
 		self.sc = SparkContext(conf=self.conf)
 		self.sql = HiveContext(self.sc)
-		database = self.sql.sql('show databases').collect()
-		have_hive = True
-		for data in database:
-			if 'myhive'.find(data['result']) >= 0:
-				have_hive = False
-		if have_hive :
-			print 'init myhive database!'
-			self.sql.sql('create database myhive')
 		self.sql.sql('use myhive')
-		# print self.sql.sql("show tables").collect()
+		self.curlan = language
+		self.loadWord_state = False
+		
+	#get current language word
+	def getAllWord(self):
+		#lateral view outer explode(genre) s as genreId
+		sql_s = 'select * from searchapp_%s limit 100'%self.curlan
+		print sql_s
+		self.curDataWord = self.sql.sql(sql_s)
+		self.loadWord_state = True
+		# print self.curDataWord.count()
 
 	def refreshTable(self,tableName):
 		self.sql.refreshTable(tableName)
@@ -79,44 +83,104 @@ class HqlSpark():
 		return table_list
 
 	def getData(self,sql_hive):
-		# self.sql.registerDataFrameAsTable(self.sql,'searchapp_cn')
 		datas = self.sql.sql(sql_hive).collect()
 		return datas
-		# for data in datas:
-			# print data
 
 	#according input words find hintword from table hintword
-	def selectWord(self,base_words):
-		# base_wordsc = self.sc.parallelize(base_words)
-		base_wordFr = self.sql.createDataFrame(base_words,als.thinkWord_shame)
+	def selectHintWord(self,base_wordFr):
+		hintWord = self.sql.sql('select word,hintWord from hintword')
+		word = hintWord.join(base_wordFr,hintWord.hintWord == base_wordFr.word,'outer').select(hintWord.word).distinct()
+		word_news = self.curDataWord.join(word,word.word == self.curDataWord.word,'outer').select(self.curDataWord.word,'priority','searchApp','searchCount','genre').distinct()
+		return word_news
 		
-		print base_wordFr.collect()
-		# hintWord = self.sql.sql('select word,hintWord from hintword')
-		# data = hintWord.join(base_wordFr,hintWord.hintWord == base_wordFr.hintWord,'outer').select(hintWord.hintWord).collect()
-		# print data
-		# data = []
-		# for word in base_words:
-		# 	# word = \''+word+'\''
-		# 	word = 'hintWord.hintWord=\'%s\''%word
-		# 	data.append(hintWord.filter(word).collect())
-		
+	#according to appId find word from searchapp
+	def selectAppIdWord(self,appIds):
+		result = None
+		for appId in appIds:
+			if result == None:
+				result = self.curDataWord.filter(functions.array_contains(self.curDataWord.searchApp,appId)).select('word','priority','searchApp','searchCount','genre').distinct()
+			res = self.curDataWord.filter(functions.array_contains(self.curDataWord.searchApp,appId)).select('word','priority','searchApp','searchCount','genre').distinct()
+			result = result.unionAll(res)
+			word = result.select('word')
+		return  result,word
 
+	#according to genre id find word from searchApp
+	def selectGenreWord(self,genreIds):
+		result = None
+		for gId in genreIds:
+			if result == None:
+				result = self.curDataWord.filter(functions.array_contains(self.curDataWord.genre,gId)).select('word','priority','searchApp','searchCount','genre').distinct()
+			res = self.curDataWord.filter(functions.array_contains(self.curDataWord.genre,gId)).select('word','priority','searchApp','searchCount','genre').distinct() 			
+			result = result.unionAll(res)
+		return result
+	# get all word for analysis
+	def getAnalysisWords(self,appIds,genreIds):
+		if appIds == None or len(appIds) <= 0:
+			return None
+		appWord,word = self.selectAppIdWord(appIds)
+		genreWord = None
+		thinkWord = None
+		if genreIds != None and len(genreIds) > 0:
+			genreWord = self.selectGenreWord(genreIds)
+		if word and word.count() > 0:
+			thinkWord = self.selectHintWord(word)
+		if appWord and genreWord and thinkWord:
+			return appWord.unionAll(genreWord).unionAll(thinkWord).distinct()
+		elif appWord and genreWord:
+			return appWord.unionAll(genreWord).distinct()
+		elif appWord and thinkWord:
+			return appWord.unionAll(thinkWord).distinct()
+		elif genreWord and thinkWord:
+			return genreWord.unionAll(thinkWord).distinct()
+		elif appWord:
+			return appWord.distinct()
+		elif genreWord:
+			return genreWord.distinct()
+		else:
+			return thinkWord.distinct()
+
+	#build Matrix
+	def buildMatrix(self,words):
+		class_all = self.sql.sql("select genreID from category order by genreID desc")
+		c_genres = class_all.collect()
+		genres = {}
+		i = 0
+		for c in c_genres:
+			genres.setdefault(c.genreID,i)
+			i += 1
+
+		datas = words.select('genre').collect()
+		mlength = len(c_genres)
+		nlength = len(datas)
+		Matrix = numpy.zeros((nlength,mlength))
+		num = 0
+		for data in datas:
+			for ge in data.genre:
+				Matrix[num][genres.get(ge)] = 1
+		return Matrix
+
+	#get Input data 
+	def getInPut(self,appIds,genreIds):
+		words = self.getAnalysisWords(appIds,genreIds)
+		return self.buildMatrix(words)
 
 def main():
 	hqlS = HqlSpark()
-	hqlS.selectWord(['world','travel','tiny','the','poker','nytimes'])
-	# hqlS.createTable('create table searchapp (word string,priority string,searchapp string,searchCount string,genre string,type string,time string)')
-	# hqlS.insertData('insert into wordSelectFeature values(\'indianapolis indians\',4605,289,0,1)')
-	# print hqlS.getData('select * from searchapp_cn limit 10')
-	# hqlS.deleteDataFromTable(table='searchapp',d_type='')
-	# data = sw().readObj('word_list.txt')
-	# hqlS.insertDataFromStruct(data[1:10],d_type = 'cn',state=False)
-	# datas = hqlS.getData('select * from searchapp_cn limit 10')
-	# for data in datas:
-	# 	print data
-	# hqlS.deleteDataFromTable()
-	# re = hqlS.showTales()
-	# for r in re:
-		# print r
+	# # pass
+	hqlS.getAllWord()
+	# start = time.time()
+	# # searcAppIds = [['1102138730'], ['1031897589'], ['1120562180'], ['972356413'], ['1112060888'], ['1119225952'], ['1080608190']]
+	searcAppIds = ['610391947',]
+	# genreIds = ['6005','7014']
+	result,word = hqlS.selectAppIdWord(searcAppIds)
+	result.show()
+	Matrix = hqlS.buildMatrix(result)
+
+	print type(Matrix),len(Matrix[0])
+	# result.show()	
+	# end = time.time()
+	# print end - start
+	pass
+	
 if __name__ == '__main__':
 	main()

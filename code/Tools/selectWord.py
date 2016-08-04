@@ -233,7 +233,7 @@ def main():
 	# SelectWord.insert_analysis_data()
 	# select.getTopKClassWord(30,20)
 
-	select.getTopKKeyWord(50,20)
+	# select.getTopKKeyWord(50,20)
 	# select.getTopKTitleWord(50,20)
 
 

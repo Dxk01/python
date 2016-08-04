@@ -98,6 +98,13 @@ class RecieveFile():
 		self.dic_w.setdefault(word)
 		return True
 
+	# def buildRecord(self,wordR):
+	# 	# for word in wordR:
+	# 	# word = []
+	# 	wordR[2] = wordR[2].split(',')
+	# 	wordR[4] = wordR[4].split(',')
+	# 	return 
+
 	# deal data and insert into dataBase
 	def deal_FileData_SearchApp(self,file,remotefile,d_type='cn'):
 		min_s = ''
@@ -125,7 +132,10 @@ class RecieveFile():
 			# print len(data_list)
 			for i in xrange(len(data_list)-1):
 				word_data = data_list[i].split('###')
+				###
 				if self.deal_Word(word_data[0].decode('utf8'),d_type):
+					word_data[2] = word_data[2].split(',')
+					word_data[4] = word_data[4].split(',')
 					word_list.append(word_data)
 			min_s = data_list[len(data_list)-1]
 			# print len(word_list)

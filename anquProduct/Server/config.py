@@ -27,11 +27,10 @@ hintWord = 'searchHint'
 #系统运行各模块包路径
 # spark run file path config 
 runfile = '/home/mysql1/anqu/python/anquProduct/Server'
-# you add runfile to your system PATH 
 RecieveFile = runfile+'/RecieveileData'
 insertFile = runfile + '/insertDataHql'
 InitFile = runfile + 'Init'
-ClusterFile = runfile + 'Cluster'
+ClusterFile = runfile + '/Cluster'
 sparkRunFile1 = '/home/mysql1/spark/python'
 sparkRunFile2 = '/home/mysql1/spark/python/pyspark'
 sparkRunFile3 = '/home/mysql1/spark/python/lib/py4j'
@@ -44,10 +43,10 @@ searchapp_cn = dataFilePath + 'searchapp_cn_20160801.txt'
 hintword_file = dataFilePath+'hintWord.txt'
 
 
-# fileResaultPath = '/home/mysql1/anqu/analysisResault/'  #config the path what you want
+fileResaultPath = '/home/mysql1/anqu/analysisResault/'  #config the path what you want
 # fileClassResaultPath = fileResaultPath + 'ClassWord'
 # fileKeyWordResaultPath = fileResaultPath + 'KeyWord'
-# fileObjectPath = fileResaultPath + "Object"
+fileObjectPath = fileResaultPath + "Object"
 # fileRootPath = '/home/mysql1/anqu/python/code/'        #config the path being the point your code was contained ! 
 # fileToolsPath = fileRootPath + "Tools"
 # fileWordsPath = fileRootPath+'Word'
@@ -65,6 +64,8 @@ sys.path.append(insertFile)
 sys.path.append(sparkRunFile1)
 sys.path.append(sparkRunFile2)
 sys.path.append(sparkRunFile3)
+sys.path.append(ToolsFile)
+sys.path.append(ClusterFile)
 reload(sys)
 sys.setdefaultencoding('utf8')
 

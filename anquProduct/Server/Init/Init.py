@@ -39,9 +39,12 @@ class InitClass():
 			print tableName,d_type
 			state = False  # False rewrite search table 
 			while  line != None and len(line):
-				lines.append(line[0:-4].split("###"))
+				word = line[0:-4].split("###")
+				word[2] = word[2].split(',')
+				word[4] = word[4].split(',')
+				lines.append(word)
 				# print line
-				if len(lines) > 0 and len(lines) >= 20000:
+				if len(lines) > 0 and len(lines) >= 10000:
 					self.myHql.insertDataFromStruct(lines,tableName,d_type,state)
 					state = True
 					lines = []
@@ -59,7 +62,8 @@ class InitClass():
 def main():
 	init_c = InitClass()
 	# init_c.init_category()
-	init_c.init_HintWord()
+	# init_c.init_HintWord()
+	init_c.init_searchapp()
 
 if __name__ == '__main__':
 	main()

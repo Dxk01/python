@@ -5,27 +5,37 @@
 
 import sys
 sys.path.append('/home/mysql1/anqu/python/anquProduct/Server')
-sys.path.append('/home/mysql1/anqu/python/anquProduct/Server/RecieveFileData')
 reload(sys)
 sys.setdefaultencoding('utf8')
 import config
+import cPickle as pickle
+# from pyspark import Broadcast
 # from file_op import file_op
-from HqlSpark import HqlSpark
-from pyspark import SparkConf
-from pyspark import SparkContext
 
 class selectWord():
 	def __init__(self):
-		self.myHql = HqlSpark()
+		pass
+		# self.myHql = HqlSpark()
 		# self.conf = SparkConf().setAppName('selectWord')
 		# self.sc = SparkContext(conf=self.conf)
 		# self.
-	# according input word get think word
-	def getThinkWord(self,base_words):
+	#数据对象写入文件存储
+	def writeObj(self,obj,file):
+		filepath = config.fileObjectPath+'/'
+		f = open(filepath+file, 'w')
+		pickle.dump(obj, f)
+		f.close()
+
+	#读取文件中的数据对象
+	def readObj(self,file):
+		filepath = config.fileObjectPath+'/'
+		f = open(filepath+file,'r')
+		return pickle.load(f)
 		
 
 def main():
 	sw = selectWord()
+	print config.fileObjectPath
 
 if __name__ == '__main__':
 	main()
