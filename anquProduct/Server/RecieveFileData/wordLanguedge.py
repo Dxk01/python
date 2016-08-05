@@ -30,12 +30,20 @@ class WordLanguedge():
 			return False
 
 	def is_english(self,word):
-		if word.isalnum():
-			if word.isdigit():
+		zhPattern = re.compile(u'[\s]+')
+		# an = re.compile('')
+		#一个小应用，判断一段文本中是否包含japan：
+		# contents=u'一个小应用，判断一段文本中是否包含japan'
+		match = zhPattern.search(c_str)
+		if match:
+			an = re.compile(u'[^\s,^\d]+')
+			ma = an.search(c_str)
+			if ma:
+				# print ma.group(0)
 				return False
-			else:
-				return True
-		return False
+		else:
+			return False
+		return True
 
 	#是否包含单引号
 	def is_contains(self,c_str):
@@ -67,6 +75,8 @@ class WordLanguedge():
 			if ma:
 				# print ma.group(0)
 				return False
+		else:
+			return False
 		return True
 	#judge word is Russian
 	def is_Russian(self,c_str):
@@ -81,6 +91,8 @@ class WordLanguedge():
 			if ma:
 				# print ma.group(0)
 				return False
+		else:
+			return False
 		return True
 	#judge word is french
 	def is_French(self,c_str):
@@ -95,6 +107,24 @@ class WordLanguedge():
 			if ma:
 				# print ma.group(0)
 				return False
+		else:
+			return False
+		return True
+
+	def is_Arabic(self,word):
+		zhPattern = re.compile(u'[\u0600-\u06FF,\u0750-\u077F,\s]+')
+		# an = re.compile('')
+		#一个小应用，判断一段文本中是否包含japan：
+		# contents=u'一个小应用，判断一段文本中是否包含japan'
+		match = zhPattern.search(c_str)
+		if match:
+			an = re.compile(u'[^\u0600-\u06FF,^\u0750-\u077F,^\s,^\d]+')
+			ma = an.search(c_str)
+			if ma:
+				# print ma.group(0)
+				return False
+		else:
+			return False
 		return True
 
 	#init func 
@@ -109,7 +139,9 @@ class WordLanguedge():
 		'ru':self.is_Russian,
 		'ta':self.is_chinese_traditional,
 		'jp':self.is_japanese
+		'sa':self.is_Arabic
 		}
+
 
 	#judge a word is Traditional chinese (TaiWan)
 	def is_chinese_traditional(self,c_str):

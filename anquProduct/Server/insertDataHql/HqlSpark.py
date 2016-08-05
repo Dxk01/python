@@ -13,6 +13,7 @@ import config
 
 from pyspark import SparkConf,SparkContext
 from pyspark.sql import HiveContext
+from pyspark.mllib.clustering import KMeans,KMeansModel
 from pyspark.sql.types import StructType,StructField,IntegerType,StringType,LongType
 from pyspark.sql import functions
 from pyspark.sql import Row
@@ -23,13 +24,13 @@ import time
 class HqlSpark():
 	# init Spark sql 
 	def __init__(self,language = 'cn'):
-		self.conf = SparkConf().setAppName("my_hive")
+		self.conf = SparkConf().set("spark.driver.allowMultipleContexts","true")
 		self.sc = SparkContext(conf=self.conf)
 		self.sql = HiveContext(self.sc)
 		self.sql.sql('use myhive')
 		self.curlan = language
 		self.loadWord_state = False
-		
+
 	#get current language word
 	def getAllWord(self):
 		#lateral view outer explode(genre) s as genreId
@@ -91,6 +92,7 @@ class HqlSpark():
 		hintWord = self.sql.sql('select word,hintWord from hintword')
 		word = hintWord.join(base_wordFr,hintWord.hintWord == base_wordFr.word,'outer').select(hintWord.word).distinct()
 		word_news = self.curDataWord.join(word,word.word == self.curDataWord.word,'outer').select(self.curDataWord.word,'priority','searchApp','searchCount','genre').distinct()
+		word_news = word_news.dropna(how='any')
 		return word_news
 		
 	#according to appId find word from searchapp
@@ -102,6 +104,7 @@ class HqlSpark():
 			res = self.curDataWord.filter(functions.array_contains(self.curDataWord.searchApp,appId)).select('word','priority','searchApp','searchCount','genre').distinct()
 			result = result.unionAll(res)
 			word = result.select('word')
+			result = result.dropna(how='any')
 		return  result,word
 
 	#according to genre id find word from searchApp
@@ -154,9 +157,11 @@ class HqlSpark():
 		nlength = len(datas)
 		Matrix = numpy.zeros((nlength,mlength))
 		num = 0
+		print len(Matrix)
 		for data in datas:
 			for ge in data.genre:
 				Matrix[num][genres.get(ge)] = 1
+			num += 1
 		return Matrix
 
 	#get Input data 
@@ -164,19 +169,29 @@ class HqlSpark():
 		words = self.getAnalysisWords(appIds,genreIds)
 		return self.buildMatrix(words)
 
+	# k_means analysis 
+	def spark_means(self,Matrix,Kcluster = 20,MaxIterations = 10,runs = 10):
+		cluster_data = self.sc.parallelize(Matrix)
+		trains = KMeans().train(cluster_data,Kcluster,MaxIterations,runs)
+		results = trains.predict(cluster_data).collect()
+		return results
+
 def main():
 	hqlS = HqlSpark()
-	# # pass
+	# # # pass
 	hqlS.getAllWord()
 	# start = time.time()
-	# # searcAppIds = [['1102138730'], ['1031897589'], ['1120562180'], ['972356413'], ['1112060888'], ['1119225952'], ['1080608190']]
+	# # # searcAppIds = [['1102138730'], ['1031897589'], ['1120562180'], ['972356413'], ['1112060888'], ['1119225952'], ['1080608190']]
 	searcAppIds = ['610391947',]
-	# genreIds = ['6005','7014']
-	result,word = hqlS.selectAppIdWord(searcAppIds)
-	result.show()
+	genreIds = ['6005','7014']
+	result,word = hqlS.getAnalysisWords(searcAppIds,genreIds)
+	# result.show()
 	Matrix = hqlS.buildMatrix(result)
+	c_result = hqlS.spark_means(Matrix)
 
-	print type(Matrix),len(Matrix[0])
+	print  
+	# print Matrix[0:5]
+	# print type(Matrix),len(Matrix[0])
 	# result.show()	
 	# end = time.time()
 	# print end - start

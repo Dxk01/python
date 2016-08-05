@@ -6,12 +6,13 @@ import sys
 sys.path.append('/home/mysql1/anqu/python/anquProduct/Server')
 reload(sys)
 sys.setdefaultencoding('utf8')
+import config
 
 from pyspark import SparkConf,SparkContext
 from pyspark.mllib.clustering import KMeans,KMeansModel
 from numpy import array
 from math import sqrt
-# from selectWord import selectWord as SW
+from selectWord import selectWord as SW
 import time
 
 
@@ -30,6 +31,7 @@ class KMeansCluster():
 		return results
 
 def main():
+
 	# kmc = KMeansCluster()
 	sw = SW()
 	data = sw.readObj("Matrix.txt")
@@ -37,11 +39,12 @@ def main():
 	# for da in data:
 		# print da ,type(da)
 		# break
-	# results = kmc.K_means(data)
+	results = KMeansCluster.K_means(data)
 	# for re in results:
 		# print re
-	# print results[0:20]
+	print results[0:20]
 	# time().sleep(20)
+	pass
 
 
 if __name__ == '__main__':
