@@ -30,12 +30,17 @@ class HqlSpark():
 		self.sql.sql('use myhive')
 		self.curlan = language
 		self.loadWord_state = False
+		self.curDataWord = None
 
 	#get current language word
-	def getAllWord(self):
+	def getAllWord(self,language='cn'):
+		if self.curDataWord != None:
+			if self.curlan == language:
+				return 
+		self.lan = language
 		#lateral view outer explode(genre) s as genreId
 		sql_s = 'select * from searchapp_%s limit 100'%self.curlan
-		print sql_s
+		# print sql_s
 		self.curDataWord = self.sql.sql(sql_s)
 		self.loadWord_state = True
 		# print self.curDataWord.count()
@@ -177,17 +182,17 @@ class HqlSpark():
 		return results
 
 def main():
-	hqlS = HqlSpark()
-	# # # pass
-	hqlS.getAllWord()
-	# start = time.time()
-	# # # searcAppIds = [['1102138730'], ['1031897589'], ['1120562180'], ['972356413'], ['1112060888'], ['1119225952'], ['1080608190']]
-	searcAppIds = ['610391947',]
-	genreIds = ['6005','7014']
-	result,word = hqlS.getAnalysisWords(searcAppIds,genreIds)
-	# result.show()
-	Matrix = hqlS.buildMatrix(result)
-	c_result = hqlS.spark_means(Matrix)
+	# hqlS = HqlSpark()
+	# # # # pass
+	# hqlS.getAllWord()
+	# # start = time.time()
+	# # # # searcAppIds = [['1102138730'], ['1031897589'], ['1120562180'], ['972356413'], ['1112060888'], ['1119225952'], ['1080608190']]
+	# searcAppIds = ['610391947',]
+	# genreIds = ['6005','7014']
+	# result,word = hqlS.getAnalysisWords(searcAppIds,genreIds)
+	# # result.show()
+	# Matrix = hqlS.buildMatrix(result)
+	# c_result = hqlS.spark_means(Matrix)
 
 	print  
 	# print Matrix[0:5]
