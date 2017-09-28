@@ -3,14 +3,11 @@
 作者：liguoyu
 """
 import time
-from http import cookiejar
-
-import requests
-from bs4 import BeautifulSoup
 import json
 from Login import Login
 from MyCode import config
 import codecs
+import random
 
 class SpiderTopicData(object):
 	"""
@@ -55,9 +52,11 @@ class SpiderTopicData(object):
 		# self.session
 		try:
 			res = self.session.post(link_url,data=self.data,headers=self.headers)
+			time.sleep(random.randint(4,12))
 		except:
 			self.relogin()
 			res = self.session.post(link_url,data=self.data,headers=self.headers)
+			time.sleep(random.randint(4,12))
 		topic = json.loads(res.text)
 		# topic = eval(res.text)
 		cur_topic = topic['msg'][0]
@@ -99,8 +98,8 @@ class SpiderTopicData(object):
 			if sub_id not in self.record_topic_data:
 				self.record_topic_data[sub_id] = sub_name
 			if sub_id not in self.record_topic_link_data:
-				self.record_topic_data[sub_id] = []
-			self.record_topic_data[sub_id].append(parent_topic_id)
+				self.record_topic_link_data[sub_id] = []
+			self.record_topic_link_data[sub_id].append(parent_topic_id)
 		return existed,parent_topic_id,child_topic_id
 
 	def getSubTopic(self,parent_topic_id='19778317',child_topic_id=''):
@@ -121,7 +120,6 @@ class SpiderTopicData(object):
 			state,parent_topic_id,child_topic_id = self.recordData(result)
 		return sub_topics_id
 
-
 	def getAllTopic(self):
 		"""
 		爬取队列所有话题及子话题
@@ -134,14 +132,16 @@ class SpiderTopicData(object):
 			sub_topics = self.getSubTopic(parent_topic_id=topic_id)
 			self.waitting_list.extend((list(set(sub_topics))))
 			self.havefinished_list.append(topic_id)
-			time.sleep(5)
+			print "当前一获取topic number:{}\t 当前已遍历 topic number: {}"\
+				.format(len(self.havefinished_list)+len(self.waitting_list),len(self.havefinished_list))
+			self.writeResulttoFile()
 
-	def writeResulttoFile(self,topic_file=config.TopicFilePath+"zhihu_topic.txt",topic_link_file = config.TopicFilePath+'zhihu_topic_link.txt'):
-		with codecs.open(topic_file,'w') as topic_fp:
-			json.dump(self.record_topic_data,topic_fp)
+	def writeResulttoFile(self,topic_file=config.TopicFilePath+"zhihu_topic.json",topic_link_file = config.TopicFilePath+'zhihu_topic_link.json'):
+		with codecs.open(topic_file,'w',encoding='utf8') as topic_fp:
+			json.dump(self.record_topic_data,topic_fp,ensure_ascii=False,encoding='utf8')
 
-		with codecs.open(topic_link_file,'w') as topic_link_fp:
-			json.dump(self.record_topic_link_data,topic_link_fp)
+		with codecs.open(topic_link_file,'w',encoding='utf8') as topic_link_fp:
+			json.dump(self.record_topic_link_data,topic_link_fp,ensure_ascii=False,encoding='utf8')
 
 
 def main():
@@ -151,9 +151,9 @@ def main():
 	# spiderData.recordData(result)
 	# spiderData.getSubTopic()
 	spiderData.getAllTopic()
-	spiderData.writeResulttoFile()
+	# spiderData.writeResulttoFile()
 	# print set(spiderData.waitting_list)
-	# print len(spiderData.waitting_list)
+	print len(spiderData.havefinished_list)
 
 if __name__ == "__main__":
 	main()
