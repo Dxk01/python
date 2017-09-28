@@ -16,6 +16,11 @@ SentenceSimilarly : 主要涉及句子的相似度问题，解决query 泛化和
     实现了 doc2vec (paragraph2vec based word2vec),docsim (sentence2vec),jecard distance combine tf-idf 
     
 Spider : 引用网上的微博评论爬取的code
+		Login.py 知乎模拟登陆脚本，还有验证码识别脚本，但因准确率问题，在调试中
+		SpiderTopicData.py 爬取知乎topic 数据，以及topic 树关系
+		SpiderTopicQuestions.py 爬取topic 下的questions 数据，开发中 。。。 。。。
+		
+
 
 tools ： pre process scripts
 
