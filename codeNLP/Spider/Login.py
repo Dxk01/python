@@ -11,7 +11,7 @@ import json
 
 class Login(object):
 	""" 登陆 知乎 类 实现爬取数据时的知乎账号登陆 """
-	def __init__(self,Email='liguoyu_a@163.com',password='liguoyu123'):
+	def __init__(self,Email='l8888@email.com',password='l888888'):
 		"""
 		初始化 函数，
 		初始化登陆时的headers，session，data以及
