@@ -96,7 +96,7 @@ def get_json(session=None, headers=None, data=None):
 
 
 if __name__ == '__main__':
-	email = "liguoyu_a@163.com"
-	password = "liguoyu123"
+	email = "8888888@163.com"
+	password = "8888888"
 	login(email, password)
 	json_str = ""
