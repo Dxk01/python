@@ -8,6 +8,7 @@ from Login import Login
 from MyCode import config
 import codecs
 import random
+import pickle
 
 class SpiderTopicData(object):
 	"""
@@ -22,8 +23,7 @@ class SpiderTopicData(object):
 		self.headers = self.login.getHeaders()
 		self.data = self.login.getData()
 		self.session = self.login.getSession()
-		# self.session.encoding = 'utf8'
-		# print self.session.
+
 		# data link list
 		self.havefinished_list = []   # 已经处理的数据连接
 		self.waitting_list = []       # 未处理的数据连接
@@ -120,6 +120,7 @@ class SpiderTopicData(object):
 			state,parent_topic_id,child_topic_id = self.recordData(result)
 		return sub_topics_id
 
+
 	def getAllTopic(self):
 		"""
 		爬取队列所有话题及子话题
@@ -134,25 +135,48 @@ class SpiderTopicData(object):
 			self.havefinished_list.append(topic_id)
 			print "当前一获取topic number:{}\t 当前已遍历 topic number: {}"\
 				.format(len(self.havefinished_list)+len(self.waitting_list),len(self.havefinished_list))
+			self.recordState()
 			self.writeResulttoFile()
 
-	def writeResulttoFile(self,topic_file=config.TopicFilePath+"zhihu_topic.json",topic_link_file = config.TopicFilePath+'zhihu_topic_link.json'):
+	def writeResulttoFile(self,topic_file=config.TopicFilePath+"zhihu_topic_1.json",topic_link_file = config.TopicFilePath+'zhihu_topic_link_1.json'):
 		with codecs.open(topic_file,'w',encoding='utf8') as topic_fp:
 			json.dump(self.record_topic_data,topic_fp,ensure_ascii=False,encoding='utf8')
 
 		with codecs.open(topic_link_file,'w',encoding='utf8') as topic_link_fp:
 			json.dump(self.record_topic_link_data,topic_link_fp,ensure_ascii=False,encoding='utf8')
 
+	def recordState(self):
+		with codecs.open(config.TopicFilePath+"havafinished_topic.txt",'w',encoding='utf8') as fp:
+			pickle.dump(self.havefinished_list,fp)
+
+		with codecs.open(config.TopicFilePath + "waiting_topic.txt", 'w', encoding='utf8') as fp:
+			pickle.dump(self.waitting_list,fp)
+
+	def reload(self):
+		with codecs.open(config.TopicFilePath+"havafinished_topic.txt",'r',encoding='utf8') as fp:
+			self.havefinished_list = pickle.load(fp)
+
+		with codecs.open(config.TopicFilePath + "waiting_topic.txt", 'r', encoding='utf8') as fp:
+			self.waitting_list = pickle.load(fp)
+
+		with codecs.open(config.TopicFilePath+"zhihu_topic_1.json",'r',encoding='utf8') as topic_fp:
+			self.record_topic_data = json.load(topic_fp,ensure_ascii=False,encoding='utf8')
+
+		with codecs.open(config.TopicFilePath+"zhihu_topic_1.json",'r',encoding='utf8') as topic_link_fp:
+			self.record_topic_link_data = json.dump(topic_link_fp,ensure_ascii=False,encoding='utf8')
+
+
+
+
 
 def main():
 	spiderData = SpiderTopicData()
-	spiderData.setRootTopic()
+	# spiderData.setRootTopic()
+	spiderData.reload()
 	# result = spiderData.getLinkTopic()
 	# spiderData.recordData(result)
 	# spiderData.getSubTopic()
 	spiderData.getAllTopic()
-	# spiderData.writeResulttoFile()
-	# print set(spiderData.waitting_list)
 	print len(spiderData.havefinished_list)
 
 if __name__ == "__main__":
