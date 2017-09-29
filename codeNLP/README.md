@@ -18,7 +18,11 @@ SentenceSimilarly : 主要涉及句子的相似度问题，解决query 泛化和
 Spider : 引用网上的微博评论爬取的code
 		Login.py 知乎模拟登陆脚本，还有验证码识别脚本，但因准确率问题，在调试中
 		SpiderTopicData.py 爬取知乎topic 数据，以及topic 树关系
-		SpiderTopicQuestions.py 爬取topic 下的questions 数据，开发中 。。。 。。。
+		SpiderTopicQuestions.py 爬取topic 下的questions 数据，可以配置获取question 的数量，存储位置
+        SpiderData.py 爬取 批量 topic的批量问题，需要设置topic SpiderTopicData 爬取的数据topic——link数据解析出叶子话题，code中时获取从根话题算起的第三级话题
+        TopicTree.py 有根据SpiderTopicData.py爬取的topic数据构建话题树
+        注：话题中未必话题爬取时的封号或封IP问题采用随机定时间隔爬取连接的方法，效率可能有点慢，可根据需要修改；
+        为保险起见最好保留，以避免封号或封IP的问题
 		
 
 
