@@ -3,11 +3,7 @@
 作者：liguoyu
 """
 
-# import sys
-# sys.setdefaultencoding('utf8')
-# reload(sys)
 import time
-from Login import Login
 import urllib2
 import random
 import re
@@ -25,16 +21,16 @@ class SpiderTopicQuestions(object):
 		"""
 		初始化相关参数
 		"""
-		self.getQuestions_number = 2000
+		self.getQuestions_number = 200
 		self.savefilename = None
 
-	def setSaveFile(self,file=config.TopicFilePath+"topic_questions.csv"):
+	def setSaveFile(self,file=config.TopicFilePath+"topic_questions_test.csv"):
 		self.savefilename = file
 
-	def setQuestions_number(self,number=2000):
+	def setQuestions_number(self,number=200):
 		self.getQuestions_number = number
 
-	def getOnePageContent(self,url='https://www.zhihu.com/topic/19661050/questions?page=2'):
+	def getOnePageContent(self,url='https://www.zhihu.com/topic/19588911/questions?page=2'):
 		"""
 		获取网页内容
 		:param url:
@@ -43,9 +39,13 @@ class SpiderTopicQuestions(object):
 		# 构建请求的 request
 		request = urllib2.Request(url)
 		# 获取请求的页面 HTML 代码
-		response = urllib2.urlopen(request)
-		# 将页面代码转成 UTF-8
-		pageCode = response.read().decode('utf-8')
+		pageCode = None
+		try:
+			response = urllib2.urlopen(request)
+			# 将页面代码转成 UTF-8
+			pageCode = response.read().decode('utf-8')
+		except:
+			print "page not found!"
 		return pageCode
 
 	def paserContent(self,text):
@@ -54,7 +54,7 @@ class SpiderTopicQuestions(object):
 		:param text:
 		:return:
 		"""
-		pattern = re.compile(r'href="/question/(.*?)">(.*?)</a>', re.S)
+		pattern = re.compile(r'class="question_link" href="/question/(.*?)">(.*?)</a>', re.S)
 		items = re.findall(pattern, text)
 		questions = []
 		for item in items:
@@ -67,7 +67,7 @@ class SpiderTopicQuestions(object):
 			questions.append([question_id,question_text.encode('utf8')])
 		return questions
 
-	def getTopicQuestions(self,topic_id='19661050'):
+	def getTopicQuestions(self,topic_id='19651442'):
 		base_url = 'https://www.zhihu.com/topic/{}/questions'.format(topic_id)
 		print base_url
 		state = True
@@ -78,13 +78,18 @@ class SpiderTopicQuestions(object):
 			print url
 			i += 1
 			text = self.getOnePageContent(url)
+			if not text:
+				state = False
+				continue
 			page_questions = self.paserContent(text)
 			if not page_questions:
 				state = False
+				continue
+
 			questions.extend(page_questions)
 			if len(questions) > self.getQuestions_number:
 				break
-			time.sleep(random.randint(1,5))
+			time.sleep(random.randint(0, 2))
 
 		for question in questions:
 			question.append(topic_id)
