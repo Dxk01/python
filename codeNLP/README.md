@@ -10,7 +10,16 @@ Algorthm : 学习工作中使用的相关算法的学习和实现
     LinearUnit : 线性单元实现，即继承Perceptron
     NeuralNetwork : 神经网络基础算法实现
     TopicModel ：主题分析相关算法实现，包括 LDA，HDA，以及在short text 话题分析中表现较好的BTM（Biterm Topic Model）等分析模型
-    
+    参考文献：
+        A Biterm Topic Model for Short Texts
+        Xiaohui Yan, Jiafeng Guo, Yanyan Lan, Xueqi Cheng
+        Institute of Computing Technology, CAS
+        Beijing, China 100190 yanxiaohui@software.ict.ac.cn, {guojiafeng, lanyanyan, cxq}@ict.ac.cn
+        coding C++ ：BTM: https://github.com/xiaohuiyan/BTM
+                     online BTM: https://github.com/xiaohuiyan/OnlineBTM
+                     bursty BTM: https://github.com/xiaohuiyan/BurstyBTM 
+    其中 burstyBTM 尚未实现，后续追加。。。。。
+
 
 AnalysisText : 主要涉及文本分词和词标记
     主要是通过jieba,thulac,nltk 相关标记库，标记文本词，并实验对比三种标记的性能，精确度
