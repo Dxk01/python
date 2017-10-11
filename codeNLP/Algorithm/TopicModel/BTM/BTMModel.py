@@ -6,11 +6,12 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import numpy as np
 import codecs
-import time
 import random
 from Biterm import Biterm
 import pickle
 from MyCode import config
+from MyCode.tools.filterStopWords import filterStopWords
+import jieba
 
 class BtmModel(object):
 	"""
@@ -39,10 +40,28 @@ class BtmModel(object):
 		self.pw_b = list()  # double 词的统计概率分布
 		self.has_background = has_background
 
-	def loadData(self,file=config.BTMData+'btm_text_corpus.txt'):
+	def preProcess(self,file=config.BTMData+'btm_text_corpus.txt'):
+		"""
+		过滤 停用词
+		:param file:
+		:return:
+		"""
 		sentences = []
 		with codecs.open(file, 'r', encoding='utf8') as fp:
-			[sentences.append(line.strip().split(' ')) for line in fp]
+			[sentences.append(filterStopWords(line.strip().split(' '))) for line in fp]
+		with codecs.open(config.BTMData+"filterStopWord.txt", 'w', encoding='utf8') as fp:
+			[fp.write(" ".join(line)+'\n') for line in sentences]
+
+	def loadData(self,file=config.BTMData+'filterStopWord.txt'):
+		"""
+		加载文本数据，文本是已经经过分析处理
+		（最好经过词过滤 去除文本中的 停用词，无意义词等）
+		:param file: 文件路径
+		:return:
+		"""
+		sentences = []
+		with codecs.open(file, 'r', encoding='utf8') as fp:
+			[sentences.append(filterStopWords(line.strip().split(' '))) for line in fp]
 
 		return sentences
 
@@ -56,6 +75,7 @@ class BtmModel(object):
 		self.word_fre = {}   # word frequently
 		word_id = 1
 		for sentence in sentences:
+
 			for word in sentence:
 				if word not in self.word_dic:
 					self.word_dic[word] = word_id
@@ -99,7 +119,7 @@ class BtmModel(object):
 	def build_Biterms(self, sentence):
 		"""
 		获取 document 的 biterms
-		:param sentence:
+		:param sentence: word id list sentence 是切词后的每一词的ID 的列表
 		:return: biterm list
 		"""
 		win = 15 # 设置窗口大小
@@ -154,6 +174,12 @@ class BtmModel(object):
 			self.assign_biterm_topic(bit, k)
 
 	def assign_biterm_topic(self, bit, topic_id):
+		"""
+		为 biterm 赋予 topic ，并更新 相关nwz 及 nb_z 数据
+		:param bit:
+		:param topic_id:
+		:return:
+		"""
 		w1 = int(bit.get_word())-1
 		w2 = int(bit.get_word(2))-1
 		bit.setTopic(topic_id)
@@ -181,7 +207,9 @@ class BtmModel(object):
 			for bit in self.biterms:
 				self.updateBiterm(bit)
 
-	def updateBiterm(self,bit):
+	def updateBiterm(self, bit):
+		self.reset_biterm(bit)
+
 		pz = [0]*self.topic_num
 		self.compute_pz_b(bit, pz)
 
@@ -237,12 +265,97 @@ class BtmModel(object):
 			print "topic id : {}".format(topic),
 			print "\ttopic top word \n",
 			b = zip(self.nwz[int(topic)],range(self.voca_size))
-			b.sort(key=lambda x:x[0],reverse=True)
+			b.sort(key=lambda x: x[0], reverse=True)
 			for index in xrange(top_num):
 				print word_id_dic[b[index][1]+1], b[index][0],
 			print
 
+	def SentenceProcess(self,sentence):
+		"""
+		文本预处理
+		:param sentence: 输入文本
+		:return:
+		"""
+		# 去停用词等过滤处理
+		words = filterStopWords(jieba.cut(sentence))
+		words_id = []
+		# 将文本转换为 word ID
+		print words
+		[words_id.append(self.word_dic[w]) for w in words]
+		return self.build_Biterms(words_id)
 
+	def sentence_topic(self, sentence, topic_num=1, min_pro=0.01):
+		"""
+		计算 sentence 最可能的话题属性
+		:param sentence: sentence
+		:param topic_num: 返回 可能话题数目 最多返回
+		:param min_pro: 话题概率最小阈值，只有概率大于该值，才是有效话题，否则不返回
+		:return: 返回可能的话题列表，及话题概率
+		"""
+		words_id = self.SentenceProcess(sentence)
+		topic_pro = [0.0]*self.topic_num
+		sentence_word_dic = [0]*self.voca_size
+		weigth = 1.0/len(words_id)
+		for word_id in words_id:
+			sentence_word_dic[word_id] = weigth
+		for i in xrange(self.topic_num):
+			topic_pro[i] = sum(map(lambda x, y: x*y, self.nwz[i], sentence_word_dic))
+		sum_pro = sum(topic_pro)
+		topic_pro = map(lambda x: x/sum_pro, topic_pro)
+		# print topic_pro
+		min_result = zip(topic_pro, range(self.topic_num))
+		min_result.sort(key=lambda x: x[0], reverse=True)
+		result = []
+		for re in min_result:
+			if re[0] > min_pro:
+				result.append(re)
+
+		return result[:topic_num]
+
+	def infer_sentence_topic(self, sentence, topic_num=1, min_pro=0.001):
+		"""
+		BTM topic model to infer a document or sentence 's topic
+		:param sentence: sentence
+		:param topic_num: 返回 可能话题数目 最多返回
+		:param min_pro: 话题概率最小阈值，只有概率大于该值，才是有效话题，否则不返回
+		:return: 返回可能的话题列表，及话题概率
+		"""
+		sentence_biterms = self.SentenceProcess(sentence)
+
+		topic_pro = [0]*self.topic_num
+		# 短文本分析中，p (b|d) = nd_b/doc(nd_b)  doc(nd_b) 表示 计算的query 的所有biterm的计数
+		# 因此，在short text 的p(b|d) 计算为1／biterm的数量
+		bit_size = len(sentence_biterms)
+		for bit in sentence_biterms:
+			# cal p(z|d) = p(z|b)*p(b|d)
+			# cal p(z|b)
+			pz = [0]*self.topic_num
+			self.compute_pz_b(bit, pz)
+			pz_sum = sum(pz)
+			pz = map(lambda pzk: pzk/pz_sum, pz)
+
+			for x, y in zip(range(self.topic_num), pz):
+				topic_pro[x] += y/bit_size
+
+		min_result = zip(topic_pro, range(self.topic_num))
+		min_result.sort(key=lambda x: x[0], reverse=True)
+		result = []
+		for re in min_result:
+			if re[0] > min_pro:
+				result.append(re)
+		return result[:topic_num]
+
+	def reset_biterm(self, bit):
+		k = bit.getTopic()
+		w1 = int(bit.get_word())-1
+		w2 = int(bit.get_word(2))-1
+
+		self.nb_z[k] -= 1
+		self.nwz[k][w1] -= 1
+		self.nwz[k][w2] -= 1
+		min_val = -(10**(-7))
+		# if self.nb_z[k] > min_val and self.nwz[k][w1] > min_val and
+		bit.resetTopic()
 
 def save(model,file=config.BTMData+"Model/BitModel.model"):
 	with codecs.open(file,'wb') as fp:
@@ -254,12 +367,14 @@ def load(file=config.BTMData+"Model/BitModel.model"):
 	return model
 
 def main():
-	BitM = BtmModel(topic_num=51, iter_times=20, alpha=0.1, beta=0.01, has_background=False)
+	BitM = BtmModel(topic_num=51, iter_times=100, alpha=0.1, beta=0.01, has_background=False)
+	# BitM.preProcess()
 	BitM.runModel()
 	save(BitM)
 
-	# BitM = load()
+	BitM = load()
 	BitM.show()
+	print BitM.infer_sentence_topic("血战钢锯岭细思恐极情节", topic_num=2)
 
 if __name__ == "__main__":
 	main()
