@@ -254,7 +254,7 @@ class BtmModel(object):
 			k -= 1
 		return k
 
-	def show(self,top_num = 10):
+	def show(self, top_num=10):
 		print "BTM topic model \t",
 		print "topic number {}, voca word size : {}".format(self.topic_num, self.voca_size)
 		word_id_dic = {}
@@ -286,7 +286,7 @@ class BtmModel(object):
 
 	def sentence_topic(self, sentence, topic_num=1, min_pro=0.01):
 		"""
-		计算 sentence 最可能的话题属性
+		计算 sentence 最可能的话题属性,基于原始的LDA 方法
 		:param sentence: sentence
 		:param topic_num: 返回 可能话题数目 最多返回
 		:param min_pro: 话题概率最小阈值，只有概率大于该值，才是有效话题，否则不返回
@@ -315,6 +315,7 @@ class BtmModel(object):
 	def infer_sentence_topic(self, sentence, topic_num=1, min_pro=0.001):
 		"""
 		BTM topic model to infer a document or sentence 's topic
+		基于 biterm s 计算问题
 		:param sentence: sentence
 		:param topic_num: 返回 可能话题数目 最多返回
 		:param min_pro: 话题概率最小阈值，只有概率大于该值，才是有效话题，否则不返回
@@ -357,17 +358,18 @@ class BtmModel(object):
 		# if self.nb_z[k] > min_val and self.nwz[k][w1] > min_val and
 		bit.resetTopic()
 
-def save(model,file=config.BTMData+"Model/BitModel.model"):
+def save(model,file=config.BTMData+"Model/BitModel_5.model"):
 	with codecs.open(file,'wb') as fp:
 		pickle.dump(model, fp)
 
-def load(file=config.BTMData+"Model/BitModel.model"):
+def load(file=config.BTMData+"Model/BitModel_5.model"):
 	with codecs.open(file, 'rb') as fp:
 		model = pickle.load(fp)
 	return model
 
 def main():
-	BitM = BtmModel(topic_num=51, iter_times=100, alpha=0.1, beta=0.01, has_background=False)
+	BitM = BtmModel(topic_num=51, iter_times=500, alpha=0.1, beta=0.01, has_background=False)
+	""" 文本预处理 """
 	# BitM.preProcess()
 	BitM.runModel()
 	save(BitM)

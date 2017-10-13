@@ -9,7 +9,7 @@ Algorthm : 学习工作中使用的相关算法的学习和实现
     Perceptron : 个人学习的感知器算法实现
     LinearUnit : 线性单元实现，即继承Perceptron
     NeuralNetwork : 神经网络基础算法实现
-    TopicModel ：主题分析相关算法实现，包括 LDA，HDA，以及在short text 话题分析中表现较好的BTM（Biterm Topic Model）等分析模型
+    TopicModel ：主题分析相关算法实现，包括 LDA，HDA（使用gensim 包实现），以及在short text 话题分析中表现较好的BTM（Biterm Topic Model）等分析模型
     参考文献：
         A Biterm Topic Model for Short Texts
         Xiaohui Yan, Jiafeng Guo, Yanyan Lan, Xueqi Cheng
