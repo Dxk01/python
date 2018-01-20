@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/orion/PycharmProjects/Test2/MyCode/Algorithm/Seq2SeqModel/s2s_checkpoint.tfl-15000"
+all_model_checkpoint_paths: "/Users/orion/PycharmProjects/Test2/MyCode/Algorithm/Seq2SeqModel/s2s_checkpoint.tfl-15000"
