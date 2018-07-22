@@ -20,10 +20,10 @@ import tensorflow as tf
 from tensorflow.contrib.legacy_seq2seq.python.ops import seq2seq
 # from tensorflow.contrib import seq2seq
 from tensorflow.python.ops import rnn_cell
-import cPickle as pkl
+# import cPickle as pkl
+import pickle as pkl
 from multiprocessing import cpu_count
-
-
+import data_process
 # -----------------------------------------------------------------------------
 
 class SequencePattern(object):
@@ -427,8 +427,7 @@ def get_train_X_Y(data):
 	return train_X, train_Y, predict_X
 
 
-import data_process
-
+# import data_process
 # query, response = data_process.loadData()
 # train_query, train_query_response, train_response, q_max_len, r_max_len, index = data_process.pad_SentencesQR(query, response)
 print("load dic...")

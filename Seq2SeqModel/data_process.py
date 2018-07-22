@@ -4,7 +4,7 @@
 
 import os
 import jieba
-import cPickle as pkl
+import pickle as pkl
 from tflearn.data_utils import pad_sequences
 import numpy as np
 
@@ -12,7 +12,7 @@ import numpy as np
 # load data
 def loadData(dir="/Users/orion/PycharmProjects/Test2/MyCode/xiaomiScrip/history"):
 	if not os.path.exists(dir):
-		print "{} not exists".format(dir)
+		print("{} not exists".format(dir))
 
 	files = os.listdir(dir)
 	query = []
@@ -104,7 +104,7 @@ def load_data(file="xiaomi_sent_2_sent.txt"):
 
 def pad_SentencesQR(query, response):
 	q_max_len, r_max_len, query_word, response_word, index = fenci(query, response)
-	print "query max length:{}, response max length:{}".format(q_max_len, r_max_len)
+	print("query max length:{}, response max length:{}".format(q_max_len, r_max_len))
 	train_query = pad_sequences(query_word, maxlen=q_max_len, value=index)
 	train_response = pad_sequences(response_word, maxlen=r_max_len, value=index)
 	# print train_query[0]
@@ -121,10 +121,6 @@ def pad_sentences_qr(query, response, q_max_len, r_max_len, index):
 	train_response = np.array(train_response)
 	train_query_response = np.append(train_query, train_response, axis=1)
 	return train_query, train_query_response, train_response, q_max_len, r_max_len, index+1
-
-
-
-
 
 # query, response = loadData()
 # train_query, train_query_response, train_response, q_max_len, r_max_len = pad_SentencesQR(query, response)
