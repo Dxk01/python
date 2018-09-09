@@ -21,8 +21,10 @@ import pickle
 import numpy as np
 import random
 
+# import
 
-def load_data(file="data.txt"):
+
+def load_data(file="data\data.txt"):
     data = []
     with open(file, "r") as fp:
         line = fp.readline()
@@ -94,34 +96,43 @@ testY = to_categorical(test_y, nb_classes=10)
 """
 network = input_data(shape=[None, 7], name='input')
 print(network)
-network = tflearn.embedding(network, input_dim=10000, output_dim=512)
-print(network)
-branch1 = conv_1d(network, 512, 3, padding='valid', activation='relu', regularizer="L2")
+network = tflearn.embedding(network, input_dim=10, output_dim=512)
+# print(network.train_one_sample())
+# merge_data = []
+# for i in range(32):
+#     branch = conv_1d(network, 1024, i+3, padding='valid', activation='relu', regularizer="L2")
+#     merge_data.append(branch)
 branch2 = conv_1d(network, 512, 4, padding='valid', activation='relu', regularizer="L2")
 branch3 = conv_1d(network, 512, 5, padding='valid', activation='relu', regularizer="L2")
+branch1 = conv_1d(network, 512, 3, padding='valid', activation='relu', regularizer="L2")
+# branch4 = conv_1d(network, 512, 6, padding='valid', activation='relu', regularizer="L2")
+# branch5 = conv_1d(network, 512, 7, padding='valid', activation='relu', regularizer="L2")
+# branch6 = conv_1d(network, 512, 1, padding='valid', activation='relu', regularizer="L2")
+# branch7 = conv_1d(network, 512, 2, padding='valid', activation='relu', regularizer="L2")
+# branch8 = conv_1d(network, 512, 10, padding='valid', activation='relu', regularizer="L2")
 network = merge([branch1, branch2, branch3], mode='concat', axis=1)
 print(network)
 network = tf.expand_dims(network, 2)
 print(network)
 network = global_max_pool(network)
-# network = dropout(network, 0.5)
+network = dropout(network, 0.5)
+print(network)
 network = fully_connected(network, 10, activation='softmax')
 network = regression(network, optimizer='adam', learning_rate=0.001,
                      loss='categorical_crossentropy', name='target')
 """
 训练开始
 """
-model = tflearn.DNN(network, tensorboard_verbose=0)
-model.fit(trainX, trainY, n_epoch=40, shuffle=True, validation_set=(testX, testY), show_metric=True, batch_size=32)
+model = tflearn.DNN(network, tensorboard_verbose=3)
+model.fit(trainX, trainY, n_epoch=200, shuffle=True, validation_set=(testX, testY), show_metric=True, batch_size=32)
 """
 模型保存
 """
-model.save("cnn.model")
+model.save("log\cnn.model")
 """
 做测试使用
 """
-
-print(model.evaluate(testX, testY, batch_size=32))
+# print(model.evaluate(testX, testY, batch_size=32))
 test = np.random.randint(0, 10, size=7).reshape(1, 7)
 print(test)
 print("测试结果：", model.predict_label(test))
